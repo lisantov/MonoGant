@@ -24,8 +24,8 @@ class StoreTaskRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'started_at' => ['nullable', 'date'],
-            'deadline_at' => ['nullable', 'date'],
+            'started_at' => ['required', 'date'],
+            'deadline_at' => ['required', 'date', 'after_or_equal:started_at'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
             'user_email' => ['nullable', 'email', 'exists:users,email'],
         ];
