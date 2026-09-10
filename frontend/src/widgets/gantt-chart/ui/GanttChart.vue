@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, toRef } from 'vue';
+import { computed, onMounted, provide, ref, toRef } from 'vue';
 import { GanttBody, GanttHeader } from '.';
 import {
     addDays,
@@ -18,6 +18,17 @@ interface IProps {
     config?: IGanttConfig;
 }
 const props = defineProps<IProps>();
+const scrollContainer = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+    if (scrollContainer.value) {
+        const firstTask = tasksSource.tasks.value[0];
+        if (!firstTask) scrollContainer.value.scrollTo({ left: 0 });
+
+        const x = timescale.dateToX(new Date(firstTask!.started_at));
+        scrollContainer.value.scrollTo({ left: Math.max(0, x - 24) });
+    }
+});
 
 const tasksSource = useGanttTasks(toRef(props, 'tasks'));
 const timescale = useTimeScale(props.config, tasksSource.tasks);
@@ -67,12 +78,13 @@ const months = computed<IMonth[]>(() => {
 
 <template>
   <section
+    ref="scrollContainer"
     class="rounded-xl overflow-hidden border border-gray-400 bg-white flex flex-col overflow-x-auto"
   >
     <GanttHeader :months="months" />
     <GanttBody
       :months="months"
-      :tasks="tasksSource.sortedTasks.value"
+      :tasks="tasksSource.tasks.value"
     />
   </section>
 </template>

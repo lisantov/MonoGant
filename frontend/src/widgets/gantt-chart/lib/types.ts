@@ -18,6 +18,7 @@ export interface IGanttTask {
     description: string;
     started_at: string;
     deadline_at: string;
+    depends_on?: number | null;
 }
 
 export interface IGanttBar {
@@ -27,6 +28,7 @@ export interface IGanttBar {
     x: number;
     y: number;
     days: number;
+    depends_on?: number | null;
 }
 
 export const MS_PER_DAY = 1000 * 60 * 60 * 24;

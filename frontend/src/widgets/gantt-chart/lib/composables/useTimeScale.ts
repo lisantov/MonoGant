@@ -25,8 +25,8 @@ export const useTimeScale = (
         for (const task of tasks) {
             const start = startOfDay(new Date(task.started_at));
             const end = startOfDay(new Date(task.deadline_at));
-            if (!minStart || start < minStart) minStart = start;
-            if (!maxEnd || end > maxEnd) maxEnd = end;
+            if (!minStart || start < minStart) minStart = addDays(start, -30);
+            if (!maxEnd || end > maxEnd) maxEnd = addDays(end, 30);
         }
         return { minStart, maxEnd };
     };

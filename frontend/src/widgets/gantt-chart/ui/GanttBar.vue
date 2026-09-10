@@ -5,6 +5,7 @@ import {
     useGanttBarDrag,
     TIMESCALE_KEY,
     TASKS_KEY,
+    GANTT_UI_KEY,
     type IGanttBar,
 } from '../lib';
 
@@ -15,6 +16,8 @@ const props = defineProps<IProps>();
 
 const timescale = inject(TIMESCALE_KEY)!;
 const tasks = inject(TASKS_KEY)!;
+
+const { hoveredBarId } = inject(GANTT_UI_KEY)!;
 
 // локальная копия для composable'ов (нужен актуальный объект под рукой)
 const currentBar = ref<IGanttBar>({ ...props.bar });
@@ -77,6 +80,8 @@ const {
       width: currentBar.days * timescale.dayWidth.value + 'px',
     }"
     @mousedown="startDrag"
+    @mouseenter="hoveredBarId = currentBar.id"
+    @mouseleave="hoveredBarId = null"
   >
     <div class="w-full flex items-center px-2 relative">
       <div
