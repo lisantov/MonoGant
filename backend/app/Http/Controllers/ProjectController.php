@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Project\CreateProjectAction;
 use App\Http\Requests\Project\CreateProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Resources\Parse\ParseProjectResource;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Support\Facades\Gate;
@@ -38,6 +39,15 @@ class ProjectController extends Controller
      */
     public function show(Project $project) {
         return new ProjectResource($project);
+    }
+
+    /**
+     * Ultraparse of project (full info about project)
+     */
+    public function parse(Project $project) {
+        return response()->json([
+            'project' => new ParseProjectResource($project),
+        ]);
     }
 
     /**

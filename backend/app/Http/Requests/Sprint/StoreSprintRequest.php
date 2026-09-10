@@ -22,7 +22,7 @@ class StoreSprintRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:sprints,name'],
             'description' => ['nullable', 'string'],
             'started_at' => ['nullable', 'date'],
             'deadline_at' => ['nullable', 'date'],

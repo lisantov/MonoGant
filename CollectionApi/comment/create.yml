@@ -1,17 +1,16 @@
 info:
-  name: login
+  name: create
   type: http
   seq: 2
 
 http:
   method: POST
-  url: "{{host}}{{prefix}}/login"
+  url: "{{host}}{{prefix}}/tasks/1/comments"
   body:
     type: json
     data: |-
       {
-        "email": "email2@email.com",
-        "password": "asdf!!11asd@#Dhd2"
+        "body": "comment body"
       }
   auth: inherit
 

@@ -24,7 +24,7 @@ request:
     - name: prefix
       value: /api
     - name: token
-      value: 1|F0meKN2w15YsEZsFjDbZQ2PfvNe2rvs9xifdnLJw7667b3ed
+      value: 2|5szH15P5H7IKMEzYVYXmndfs54MVZz39BbL1JAcrcf6425e0
 bundled: false
 extensions:
   bruno:

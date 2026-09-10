@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TaskController;
@@ -20,12 +21,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 // Projects
 Route::group(['prefix' => '/projects/', 'middleware' => 'auth:sanctum'], function () {
-    Route::post('/', [ProjectController::class, 'create'])->middleware('auth:sanctum');
-    Route::get('/', [ProjectController::class, 'index'])->middleware('auth:sanctum');
-    Route::patch('/{project}', [ProjectController::class, 'update'])->middleware('auth:sanctum')
+    Route::post('/', [ProjectController::class, 'create']);
+    Route::get('/', [ProjectController::class, 'index']);
+    Route::patch('/{project}', [ProjectController::class, 'update'])
         ->where(['id' => '[0-9]+']);
-    Route::delete('/{project}', [ProjectController::class, 'destroy'])->middleware('auth:sanctum')
+    Route::delete('/{project}', [ProjectController::class, 'destroy'])
         ->where(['id' => '[0-9]+']);
+    Route::get('{project}', [ProjectController::class, 'show'])
+        ->where(['id' => '[0-9]+']);
+    Route::get('parse/{project}', [ProjectController::class, 'parse']);
 });
 
 // Sprints
@@ -54,4 +58,14 @@ Route::group(['prefix' => '/tasks', 'middleware' => 'auth:sanctum'], function ()
     Route::delete('/{task}', [TaskController::class, 'destroy']);
     Route::post('/{task}/dependencies', [TaskController::class, 'linkDependency']);
     Route::delete('/{task}/dependencies', [TaskController::class, 'unlinkDependency']);
+});
+
+// Comments
+Route::group(['prefix' => '/tasks/{task}/comments', 'middleware' => 'auth:sanctum'], function () {
+    Route::get('/', [CommentController::class, 'index']);
+    Route::post('/', [CommentController::class, 'store']);
+});
+
+Route::group(['prefix' => '/comments', 'middleware' => 'auth:sanctum'], function () {
+    Route::get('/{comment}', [CommentController::class, 'show']);
 });
