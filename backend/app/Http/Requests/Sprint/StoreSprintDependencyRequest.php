@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Project;
+namespace App\Http\Requests\Sprint;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateProjectRequest extends FormRequest
+class StoreSprintDependencyRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
@@ -23,9 +20,8 @@ class CreateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'started_at' => ['required', 'date'],
-            'deadline_at' => ['date'],
+            'predecessor_id' => ['required_without:successor_id', 'integer', 'prohibits:successor_id', 'exists:sprints,id'],
+            'successor_id' => ['required_without:predecessor_id', 'integer', 'prohibits:predecessor_id', 'exists:sprints,id'],
         ];
     }
 }

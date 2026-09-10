@@ -20,14 +20,18 @@ request:
     token: "{{token}}"
   variables:
     - name: host
-      value: localhost:80
+      value: 127.0.0.1:80
     - name: prefix
       value: /api
     - name: token
-      value: 1|D3xiSU2Csw09YLKVp700DhmU1Jb733AG4gyw23kC7aa8039f
+      value: 1|F0meKN2w15YsEZsFjDbZQ2PfvNe2rvs9xifdnLJw7667b3ed
 bundled: false
 extensions:
   bruno:
     ignore:
       - node_modules
       - .git
+    presets:
+      request:
+        type: http
+        url: "{{host}}{{prefix}}"
