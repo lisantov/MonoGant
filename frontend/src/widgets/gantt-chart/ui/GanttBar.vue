@@ -1,16 +1,40 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useGanttBarResize, useGanttBarDrag, type IGanttBar } from '../lib';
-import { useGranttConfigStore } from '../stores';
+import { inject, ref, watch } from 'vue';
+import {
+    useGanttBarResize,
+    useGanttBarDrag,
+    TIMESCALE_KEY,
+    TASKS_KEY,
+    type IGanttBar,
+} from '../lib';
 
 interface IProps {
     bar: IGanttBar;
 }
 const props = defineProps<IProps>();
-const currentBar = ref<IGanttBar>({ ...props.bar });
 
-// если бар — часть store, эмит не нужен, мутируем прямо там
-const { dayHeight, dayWidth } = useGranttConfigStore();
+const timescale = inject(TIMESCALE_KEY)!;
+const tasks = inject(TASKS_KEY)!;
+
+// локальная копия для composable'ов (нужен актуальный объект под рукой)
+const currentBar = ref<IGanttBar>({ ...props.bar });
+watch(
+    () => props.bar,
+    (v) => {
+        currentBar.value = { ...v };
+    }
+);
+
+// вместо emit — пишем прямо в стор через applyBarLayout
+const commit = (patch: Partial<Pick<IGanttBar, 'x' | 'days'>>) => {
+    currentBar.value = { ...currentBar.value, ...patch };
+
+    tasks.applyBarLayout(
+        currentBar.value.id,
+        { x: currentBar.value.x, days: currentBar.value.days },
+        timescale
+    );
+};
 
 const {
     isResizing,
@@ -19,13 +43,11 @@ const {
     startLeft,
     startRight,
 } = useGanttBarResize(() => currentBar.value, {
-    dayWidth,
+    dayWidth: timescale.dayWidth,
     minDays: 1,
     minX: 0,
-    maxX: 365 * dayWidth,
-    onChange: ({ x, days }) => {
-        currentBar.value = { ...currentBar.value, x, days };
-    },
+    maxX: 365 * timescale.dayWidth.value,
+    onChange: ({ x, days }) => commit({ x, days }),
 });
 
 const {
@@ -33,12 +55,10 @@ const {
     ghostX: dragGhostX,
     start: startDrag,
 } = useGanttBarDrag(() => currentBar.value, {
-    dayWidth,
+    dayWidth: timescale.dayWidth,
     minX: 0,
-    maxX: 365 * dayWidth, // пример верхней границы
-    onChange: ({ x }) => {
-        currentBar.value.x = x;
-    },
+    maxX: 365 * timescale.dayWidth.value,
+    onChange: ({ x }) => commit({ x }),
 });
 </script>
 
@@ -53,8 +73,8 @@ const {
     :style="{
       left: currentBar.x + 'px',
       top: currentBar.y + 3 + 'px',
-      height: dayHeight - 6 + 'px',
-      width: currentBar.days * dayWidth + 'px',
+      height: timescale.dayHeight.value - 6 + 'px',
+      width: currentBar.days * timescale.dayWidth.value + 'px',
     }"
     @mousedown="startDrag"
   >
@@ -78,8 +98,8 @@ const {
     :style="{
       left: dragGhostX + 'px',
       top: currentBar.y + 3 + 'px',
-      height: dayHeight - 6 + 'px',
-      width: currentBar.days * dayWidth + 'px',
+      height: timescale.dayHeight.value - 6 + 'px',
+      width: currentBar.days * timescale.dayWidth.value + 'px',
     }"
   >
     <div class="w-full h-full flex items-center px-2 text-xs text-blue-900 font-medium">
@@ -94,8 +114,8 @@ const {
     :style="{
       left: resizeGhostX + 'px',
       top: currentBar.y + 3 + 'px',
-      height: dayHeight - 6 + 'px',
-      width: resizeGhostDays * dayWidth + 'px',
+      height: timescale.dayHeight.value - 6 + 'px',
+      width: resizeGhostDays * timescale.dayWidth.value + 'px',
     }"
   >
     <div class="w-full h-full flex items-center px-2 text-xs text-blue-900 font-medium">

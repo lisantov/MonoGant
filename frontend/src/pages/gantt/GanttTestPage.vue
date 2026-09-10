@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { GanttChart } from '@/widgets';
+import { DEFAULT_TASKS, GanttChart } from '@/widgets';
+import { ref } from 'vue';
+const tasks = ref(DEFAULT_TASKS);
 </script>
 
 <template>
-  <GanttChart
-    from="2026-09-10"
-    to="2026-11-10"
-  />
+  <GanttChart :tasks />
 </template>

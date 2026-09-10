@@ -1,17 +1,35 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, provide, toRef } from 'vue';
 import { GanttBody, GanttHeader } from '.';
-import { MONTH_NAMES, type IGanttTask, type IMonth } from '../lib';
+import {
+    addDays,
+    MONTH_NAMES,
+    TIMESCALE_KEY,
+    TASKS_KEY,
+    useTimeScale,
+    useGanttTasks,
+    type IGanttConfig,
+    type IGanttTask,
+    type IMonth,
+} from '../lib';
 
 interface IProps {
-    from: string | Date;
-    to: string | Date;
+    tasks?: IGanttTask[];
+    config?: IGanttConfig;
 }
 const props = defineProps<IProps>();
 
+const tasksSource = useGanttTasks(toRef(props, 'tasks'));
+const timescale = useTimeScale(props.config, tasksSource.tasks);
+
+provide(TASKS_KEY, tasksSource);
+provide(TIMESCALE_KEY, timescale);
+
 const months = computed<IMonth[]>(() => {
-    const from = new Date(props.from);
-    const to = new Date(props.to);
+    const { minStart, maxEnd } = timescale.getBounds(tasksSource.tasks.value);
+
+    const from = minStart ?? timescale.timelineStart.value;
+    const to = maxEnd ?? addDays(timescale.timelineStart.value, 60);
 
     from.setHours(0, 0, 0, 0);
     to.setHours(0, 0, 0, 0);
@@ -19,7 +37,6 @@ const months = computed<IMonth[]>(() => {
     if (from > to) return [];
 
     const result: IMonth[] = [];
-
     const cursor = new Date(from.getFullYear(), from.getMonth(), 1);
     const end = new Date(to.getFullYear(), to.getMonth(), 1);
 
@@ -28,7 +45,6 @@ const months = computed<IMonth[]>(() => {
         const monthIndex = cursor.getMonth();
         const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
 
-        // определяем границы дней внутри месяца
         const startDay =
             year === from.getFullYear() && monthIndex === from.getMonth() ? from.getDate() : 1;
 
@@ -38,6 +54,7 @@ const months = computed<IMonth[]>(() => {
         result.push({
             title: MONTH_NAMES[monthIndex]!,
             year,
+            monthIndex,
             days: Array.from({ length: endDay - startDay + 1 }, (_, i) => startDay + i),
         });
 
@@ -46,38 +63,16 @@ const months = computed<IMonth[]>(() => {
 
     return result;
 });
-
-const tasks: IGanttTask[] = [
-    {
-        name: 'Задача 1',
-        description: 'Задача 1',
-        started_at: '2026-09-10',
-        deadline_at: '2026-09-20',
-    },
-    {
-        name: 'Задача 2',
-        description: 'Задача 2',
-        started_at: '2026-9-21',
-        deadline_at: '2026-9-25',
-    },
-    {
-        name: 'Задача 3',
-        description: 'Задача 3',
-        started_at: '2026-09-26',
-        deadline_at: '2026-09-30',
-    },
-];
 </script>
 
 <template>
   <section
     class="rounded-xl overflow-hidden border border-gray-400 bg-white flex flex-col overflow-x-auto"
   >
-    <GanttHeader :months />
+    <GanttHeader :months="months" />
     <GanttBody
-      :from
-      :months
-      :tasks
+      :months="months"
+      :tasks="tasksSource.sortedTasks.value"
     />
   </section>
 </template>
