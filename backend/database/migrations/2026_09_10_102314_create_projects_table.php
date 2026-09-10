@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->timestamp('deadline_at')->nullable();
             $table->timestamp('started_at')->nullable();
-            $table->foreignId('user_id')->constrained('users');
+            $table->enum('status', StatusEnum::cases())->default('planned');
         });
     }
 

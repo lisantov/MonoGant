@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Project\CreateProjectAction;
+use App\Http\Requests\Project\CreateProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class ProjectController extends Controller
 {
@@ -12,31 +17,42 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        return ProjectResource::collection(request()->user()->projects);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(CreateProjectRequest $request)
     {
-        //
+        $project = CreateProjectAction::run($request->validated(), $request->user());
+
+        return response()->json([
+            'message' => 'Project created successfully',
+            'project' => new ProjectResource($project),
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
-    {
-        //
+    public function show(Project $project) {
+        return new ProjectResource($project);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        if (Gate::inspect('update', $project)->allowed()) {
+            $project->update($request->validated());
+
+            return response()->json(new ProjectResource($project));
+        } else {
+            throw new AccessDeniedHttpException;
+        }
+
     }
 
     /**

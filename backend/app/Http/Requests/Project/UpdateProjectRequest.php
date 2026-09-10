@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Project;
 
+use App\Enums\StatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateProjectRequest extends FormRequest
+class UpdateProjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +24,10 @@ class CreateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'started_at' => ['required', 'date'],
+            'name' => ['string'],
+            'started_at' => ['date'],
             'deadline_at' => ['date'],
+            'status' => ['enum' => StatusEnum::class],
         ];
     }
 }
