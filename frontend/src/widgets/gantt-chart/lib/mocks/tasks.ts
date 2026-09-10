@@ -1,4 +1,4 @@
-import type { IGanttTask } from '../types';
+import { GANTT_TASK_STATUS, type IGanttTask } from '../types';
 
 export const DEFAULT_TASKS: IGanttTask[] = [
     {
@@ -7,6 +7,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
+        status: GANTT_TASK_STATUS.DONE,
     },
     {
         id: 2,
@@ -15,6 +16,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
         depends_on: 1,
+        status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
         id: 3,
@@ -22,6 +24,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
+        status: GANTT_TASK_STATUS.PLANNED,
     },
     {
         id: 4,
@@ -29,6 +32,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
+        status: GANTT_TASK_STATUS.CANCELLED,
     },
     {
         id: 5,
@@ -37,6 +41,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
         depends_on: 4,
+        status: GANTT_TASK_STATUS.CANCELLED,
     },
     {
         id: 6,
@@ -44,6 +49,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
+        status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
         id: 7,
@@ -51,6 +57,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
+        status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
         id: 8,
@@ -59,6 +66,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
         depends_on: 7,
+        status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
         id: 9,
@@ -66,5 +74,50 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
+        status: GANTT_TASK_STATUS.DONE,
+    },
+    {
+        id: 10,
+        name: 'Задача 2',
+        description: 'Оу ес',
+        started_at: '2026-09-16',
+        deadline_at: '2026-09-20',
+        depends_on: 9,
+        status: GANTT_TASK_STATUS.DONE,
+    },
+    {
+        id: 11,
+        name: 'Задача 3',
+        description: 'Оу ес',
+        started_at: '2026-09-21',
+        deadline_at: '2026-09-23',
+        status: GANTT_TASK_STATUS.IN_PROGRESS,
+    },
+    {
+        id: 12,
+        name: 'Задача 1',
+        description: 'Оу ес',
+        started_at: '2026-09-10',
+        deadline_at: '2026-09-15',
+        depends_on: 11,
+        status: GANTT_TASK_STATUS.IN_PROGRESS,
+    },
+    {
+        id: 13,
+        name: 'Задача 2',
+        description: 'Оу ес',
+        started_at: '2026-09-16',
+        deadline_at: '2026-09-20',
+        depends_on: 11,
+        status: GANTT_TASK_STATUS.CANCELLED,
+    },
+    {
+        id: 14,
+        name: 'Задача 3',
+        description: 'Оу ес',
+        started_at: '2026-09-21',
+        deadline_at: '2026-09-23',
+        depends_on: 11,
+        status: GANTT_TASK_STATUS.CANCELLED,
     },
 ];

@@ -3,9 +3,11 @@ import { computed, inject, provide, ref } from 'vue';
 import { GanttBar } from '.';
 import {
     buildDependencyPath,
+    GANTT_TASK_STATUS,
     GANTT_UI_KEY,
     MS_PER_DAY,
     TIMESCALE_KEY,
+    topoSort,
     type IGanttBar,
     type IGanttTask,
     type IMonth,
@@ -22,25 +24,46 @@ const timescale = inject(TIMESCALE_KEY)!;
 const hoveredBarId = ref<number | null>(null);
 provide(GANTT_UI_KEY, { hoveredBarId });
 
-const bars = computed<IGanttBar[]>(() =>
-    props.tasks.map((task, index) => {
+const bars = computed<IGanttBar[]>(() => {
+    const result: IGanttBar[] = [];
+    const map = new Map<number, IGanttBar>();
+
+    const sorted = topoSort([...props.tasks]);
+
+    for (const [index, task] of sorted.entries()) {
         const start = new Date(task.started_at);
         const end = new Date(task.deadline_at);
         start.setHours(0, 0, 0, 0);
         end.setHours(0, 0, 0, 0);
-        const days = Math.round((end.getTime() - start.getTime()) / MS_PER_DAY) + 1;
+        const days = Math.max(Math.round((end.getTime() - start.getTime()) / MS_PER_DAY) + 1, 1);
 
-        return {
+        let x = timescale.dateToX(start);
+
+        // зависимая задача всегда прижата к правому краю родителя
+        if (task.depends_on != null) {
+            const parent = map.get(task.depends_on);
+            if (parent) {
+                x = parent.x + parent.days * timescale.dayWidth.value;
+            }
+        }
+
+        const bar: IGanttBar = {
             id: task.id,
             name: task.name,
             description: task.description,
-            x: timescale.dateToX(start),
+            x,
             y: index * timescale.dayHeight.value,
-            days: Math.max(days, 1),
+            days,
+            status: task.status,
             depends_on: task.depends_on,
+            isLocked: task.depends_on != null,
         };
-    })
-);
+        result.push(bar);
+        map.set(bar.id, bar);
+    }
+
+    return result;
+});
 
 // карта id → бар
 const barById = computed(() => {
@@ -53,6 +76,7 @@ const barById = computed(() => {
 const links = computed(() =>
     props.tasks
         .filter((t) => t.depends_on != null)
+        .filter((t) => t.status !== GANTT_TASK_STATUS.CANCELLED)
         .map((t) => {
             const from = barById.value.get(t.depends_on!);
             const to = barById.value.get(t.id);

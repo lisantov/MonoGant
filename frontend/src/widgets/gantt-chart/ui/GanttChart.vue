@@ -87,7 +87,7 @@ const { isPanning, onMouseDown: onPanStart } = usePanScroll(scrollContainer, {
 <template>
   <section
     ref="scrollContainer"
-    class="rounded-xl border border-gray-400 bg-white flex flex-col overflow-auto"
+    class="rounded-xl border border-gray-400 bg-white flex flex-col overflow-auto [overflow-anchor:none]"
     :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
     @mousedown="onPanStart"
   >

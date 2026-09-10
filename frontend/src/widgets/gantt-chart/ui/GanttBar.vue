@@ -7,6 +7,7 @@ import {
     TASKS_KEY,
     GANTT_UI_KEY,
     type IGanttBar,
+    GANTT_TASK_STYLE,
 } from '../lib';
 
 interface IProps {
@@ -63,15 +64,26 @@ const {
     maxX: 365 * timescale.dayWidth.value,
     onChange: ({ x }) => commit({ x }),
 });
+
+const onBarMouseDown = (e: MouseEvent) => {
+    if (props.bar.isLocked) return;
+    startDrag(e);
+};
+
+const onResizeMouseDown = (e: MouseEvent) => {
+    if (props.bar.isLocked) return;
+    startLeft(e);
+};
 </script>
 
 <template>
   <div
-    class="gantt-bar absolute flex bg-blue-500 text-sm text-white rounded-md ring-0 ring-transparent transition duration-150"
+    class="gantt-bar absolute flex text-sm border rounded-md ring-0 ring-transparent transition duration-150 cursor-default"
     :class="{
       'opacity-40': isDragging || isResizing,
-      'cursor-grab': !isDragging,
-      'cursor-grabbing': isDragging,
+      'cursor-grab': !isDragging && !bar.isLocked,
+      'cursor-grabbing': isDragging && !bar.isLocked,
+      [GANTT_TASK_STYLE.get(bar.status)!]: true,
     }"
     :style="{
       left: currentBar.x + 'px',
@@ -79,14 +91,15 @@ const {
       height: timescale.dayHeight.value - 6 + 'px',
       width: currentBar.days * timescale.dayWidth.value + 'px',
     }"
-    @mousedown="startDrag"
+    @mousedown="onBarMouseDown"
     @mouseenter="hoveredBarId = currentBar.id"
     @mouseleave="hoveredBarId = null"
   >
     <div class="w-full flex items-center px-2 relative">
       <div
-        class="gantt-bar-resizer absolute h-full w-2 bg-transparent left-0 cursor-col-resize"
-        @mousedown.stop="startLeft"
+        class="gantt-bar-resizer absolute h-full w-2 bg-transparent left-0"
+        :class="bar.isLocked ? 'cursor-default' : 'cursor-col-resize'"
+        @mousedown.stop="onResizeMouseDown"
       />
       {{ currentBar.name }}
       <div

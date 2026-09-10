@@ -1,4 +1,4 @@
-import { MS_PER_DAY } from './types';
+import { MS_PER_DAY, type IGanttTask } from './types';
 
 export const startOfDay = (date: Date): Date => {
     const d = new Date(date);
@@ -49,4 +49,23 @@ export const buildDependencyPath = (
         `V ${endY}`,
         `H ${endX}`,
     ].join(' ');
+};
+
+export const topoSort = (tasks: IGanttTask[]) => {
+    const byId = new Map(tasks.map((t) => [t.id, t]));
+    const visited = new Set<number>();
+    const out: IGanttTask[] = [];
+
+    const visit = (t: IGanttTask) => {
+        if (visited.has(t.id)) return;
+        visited.add(t.id);
+        if (t.depends_on != null) {
+            const parent = byId.get(t.depends_on);
+            if (parent) visit(parent);
+        }
+        out.push(t);
+    };
+
+    for (const t of tasks) visit(t);
+    return out;
 };
