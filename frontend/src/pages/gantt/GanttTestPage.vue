@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { DEFAULT_TASKS, GanttChart } from '@/widgets';
+import { DEFAULT_SPRINTS, GanttChart } from '@/widgets';
 import { ref } from 'vue';
-const tasks = ref(DEFAULT_TASKS);
+const sprints = ref(DEFAULT_SPRINTS);
 </script>
 
 <template>
-  <GanttChart :tasks />
+  <GanttChart :sprints />
 </template>

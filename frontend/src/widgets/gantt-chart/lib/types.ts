@@ -47,8 +47,6 @@ export interface IGanttSprint {
     id: number;
     name: string;
     description: string;
-    started_at: string;
-    deadline_at: string;
     status: GANTT_TASK_STATUS;
     tasks: IGanttTask[];
 }
@@ -63,6 +61,19 @@ export interface IGanttBar {
     status: GANTT_TASK_STATUS;
     next_task_id?: number | null;
     isLocked?: boolean;
+    sprint_id: number;
+}
+
+/** Вычисленный layout спринта для рендера */
+export interface IGanttSprintBar {
+    id: number;
+    name: string;
+    x: number;
+    y: number;
+    days: number;
+    height: number;
+    headerHeight: number;
+    status: GANTT_TASK_STATUS;
 }
 
 export const MS_PER_DAY = 1000 * 60 * 60 * 24;

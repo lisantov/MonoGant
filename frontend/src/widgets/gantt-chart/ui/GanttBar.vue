@@ -4,7 +4,7 @@ import {
     useGanttBarResize,
     useGanttBarDrag,
     TIMESCALE_KEY,
-    TASKS_KEY,
+    SPRINTS_KEY,
     GANTT_UI_KEY,
     type IGanttBar,
     GANTT_TASK_STYLE,
@@ -16,7 +16,7 @@ interface IProps {
 const props = defineProps<IProps>();
 
 const timescale = inject(TIMESCALE_KEY)!;
-const tasks = inject(TASKS_KEY)!;
+const sprints = inject(SPRINTS_KEY)!;
 
 const { hoveredBarId } = inject(GANTT_UI_KEY)!;
 
@@ -29,11 +29,11 @@ watch(
     }
 );
 
-// вместо emit — пишем прямо в стор через applyBarLayout
 const commit = (patch: Partial<Pick<IGanttBar, 'x' | 'days'>>) => {
     currentBar.value = { ...currentBar.value, ...patch };
 
-    tasks.applyBarLayout(
+    sprints.applyTaskLayout(
+        currentBar.value.sprint_id!,
         currentBar.value.id,
         { x: currentBar.value.x, days: currentBar.value.days },
         timescale

@@ -1,11 +1,11 @@
 import type { InjectionKey, Ref } from 'vue';
-import type { useTimeScale, useGanttTasks } from './composables';
+import type { useTimeScale, useGanttSprints } from './composables';
 
 export type TimeScale = ReturnType<typeof useTimeScale>;
-export type TasksStore = ReturnType<typeof useGanttTasks>;
+export type SprintsStore = ReturnType<typeof useGanttSprints>;
 
 export const TIMESCALE_KEY = Symbol('timescale') as InjectionKey<TimeScale>;
-export const TASKS_KEY = Symbol('tasks') as InjectionKey<TasksStore>;
+export const SPRINTS_KEY = Symbol('sprints') as InjectionKey<SprintsStore>;
 
 export interface GanttUiState {
     hoveredBarId: Ref<number | null>;

@@ -5,51 +5,40 @@ import {
     addDays,
     MONTH_NAMES,
     TIMESCALE_KEY,
-    TASKS_KEY,
+    SPRINTS_KEY,
     useTimeScale,
-    useGanttTasks,
+    useGanttSprints,
     type IGanttConfig,
-    type IGanttTask,
+    type IGanttSprint,
     type IMonth,
     usePanScroll,
 } from '../lib';
 
 interface IProps {
-    tasks?: IGanttTask[];
+    sprints?: IGanttSprint[];
     config?: IGanttConfig;
 }
 const props = defineProps<IProps>();
+
 const scrollContainer = ref<HTMLElement | null>(null);
 
-onMounted(() => {
-    const el = scrollContainer.value;
-    if (!el) return;
+const sprintsSource = useGanttSprints(toRef(props, 'sprints'));
 
-    const firstTask = tasksSource.sortedTasks.value[0];
-    if (!firstTask) {
-        el.scrollTo({ left: 0 });
-        return;
-    }
+// timescale принимает все задачи всех спринтов
+const timescale = useTimeScale(props.config, () => sprintsSource.allTasks.value.map((x) => x.task));
 
-    const x = timescale.dateToX(new Date(firstTask.started_at));
-    el.scrollTo({ left: Math.max(0, x - 24) });
-});
-
-const tasksSource = useGanttTasks(toRef(props, 'tasks'));
-const timescale = useTimeScale(props.config, tasksSource.sortedTasks);
-
-provide(TASKS_KEY, tasksSource);
+provide(SPRINTS_KEY, sprintsSource);
 provide(TIMESCALE_KEY, timescale);
 
 const months = computed<IMonth[]>(() => {
-    const { minStart, maxEnd } = timescale.getBounds(tasksSource.tasks.value);
+    const tasks = sprintsSource.allTasks.value.map((x) => x.task);
+    const { minStart, maxEnd } = timescale.getBounds(tasks);
 
     const from = minStart ?? timescale.timelineStart.value;
     const to = maxEnd ?? addDays(timescale.timelineStart.value, 60);
 
     from.setHours(0, 0, 0, 0);
     to.setHours(0, 0, 0, 0);
-
     if (from > to) return [];
 
     const result: IMonth[] = [];
@@ -63,7 +52,6 @@ const months = computed<IMonth[]>(() => {
 
         const startDay =
             year === from.getFullYear() && monthIndex === from.getMonth() ? from.getDate() : 1;
-
         const endDay =
             year === to.getFullYear() && monthIndex === to.getMonth() ? to.getDate() : daysInMonth;
 
@@ -73,10 +61,8 @@ const months = computed<IMonth[]>(() => {
             monthIndex,
             days: Array.from({ length: endDay - startDay + 1 }, (_, i) => startDay + i),
         });
-
         cursor.setMonth(cursor.getMonth() + 1);
     }
-
     return result;
 });
 
@@ -86,19 +72,29 @@ const { isPanning, onMouseDown: onPanStart } = usePanScroll(scrollContainer, {
         !!target.closest('.gantt-bar-resizer') ||
         !!target.closest('button, a, input, select, textarea'),
 });
+
+onMounted(() => {
+    const el = scrollContainer.value;
+    if (!el) return;
+
+    const first = sprintsSource.allTasks.value[0];
+    if (!first) {
+        el.scrollTo({ left: 0 });
+        return;
+    }
+    const x = timescale.dateToX(new Date(first.task.started_at));
+    el.scrollTo({ left: Math.max(0, x - 24) });
+});
 </script>
 
 <template>
   <section
     ref="scrollContainer"
-    class="rounded-xl border border-gray-400 bg-white flex flex-col overflow-auto [overflow-anchor:none]"
+    class="rounded-xl border border-gray-400 bg-white flex flex-col max-h-240 overflow-auto [overflow-anchor:none]"
     :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
     @mousedown="onPanStart"
   >
     <GanttHeader :months="months" />
-    <GanttBody
-      :months="months"
-      :tasks="tasksSource.sortedTasks.value"
-    />
+    <GanttBody :months="months" />
   </section>
 </template>
