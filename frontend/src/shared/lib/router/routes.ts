@@ -3,6 +3,10 @@ export const Routes = {
         path: '/',
         name: 'home',
     },
+    main: {
+        path: '/main',
+        name: 'main',
+    },
     login: {
         path: '/auth/login',
         name: 'login',
