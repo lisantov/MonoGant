@@ -87,7 +87,7 @@ class SprintController extends Controller
 
     private function authorizeProject(Project $project): void
     {
-        if (! Gate::inspect('update', $project)->allowed()) {
+        if (! Gate::inspect('project-member', $project)->allowed()) {
             throw new AccessDeniedHttpException;
         }
     }

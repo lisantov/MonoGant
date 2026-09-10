@@ -37,14 +37,24 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project) {
+    public function show(Project $project)
+    {
+        if (! Gate::inspect('project-show', $project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return new ProjectResource($project);
     }
 
     /**
      * Ultraparse of project (full info about project)
      */
-    public function parse(Project $project) {
+    public function parse(Project $project)
+    {
+        if (! Gate::inspect('project-show', $project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return response()->json([
             'project' => new ParseProjectResource($project),
         ]);
@@ -55,7 +65,7 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        if (Gate::inspect('update', $project)->allowed()) {
+        if (Gate::inspect('project-update', $project)->allowed()) {
             $project->update($request->validated());
 
             return response()->json(new ProjectResource($project));
@@ -70,6 +80,11 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        if (Gate::inspect('project-delete', $project)->allowed()) {
+            $project->delete();
+
+            return response()->json(null, 204);
+        }
+        throw new AccessDeniedHttpException;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\RoleEnum;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ProjectPolicy
 {
@@ -19,9 +19,9 @@ class ProjectPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Project $project): Response
+    public function view(User $user, Project $project): bool
     {
-        return Response::allow();
+        return $project->members()->where('user_id', $user->id)->exists();
     }
 
     /**
@@ -37,7 +37,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return $project->members()->where('user_id', $user->id)->exists();
+        return $project->members()->where(['user_id' => $user->id, 'role' => RoleEnum::Owner])->exists();
     }
 
     /**
@@ -45,7 +45,7 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return false;
+        return $project->members()->where(['user_id' => $user->id, 'role' => RoleEnum::Owner])->exists();
     }
 
     /**

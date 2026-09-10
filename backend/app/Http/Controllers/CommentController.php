@@ -37,7 +37,7 @@ class CommentController extends Controller
 
     private function authorizeSprint(Sprint $sprint): void
     {
-        if (! Gate::inspect('update', $sprint->project)->allowed()) {
+        if (! Gate::inspect('project-member', $sprint->project)->allowed()) {
             throw new AccessDeniedHttpException;
         }
     }
