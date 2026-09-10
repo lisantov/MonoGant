@@ -14,6 +14,7 @@ export const Routes = {
     gantt: {
         path: '/gantt',
         name: 'gantt',
+    },
     register: {
         path: '/auth/register',
         name: 'register',
