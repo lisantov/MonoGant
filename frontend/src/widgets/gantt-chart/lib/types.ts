@@ -1,3 +1,5 @@
+import type { ISprintColor } from './constants';
+
 export interface IMonth {
     title: string;
     year: number;
@@ -73,6 +75,7 @@ export interface IGanttSprintBar {
     days: number;
     height: number;
     headerHeight: number;
+    color: ISprintColor;
     status: GANTT_TASK_STATUS;
 }
 

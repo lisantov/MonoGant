@@ -13,6 +13,7 @@ import {
     type IGanttSprintBar,
     type IGanttTask,
     type IMonth,
+    getSprintColor,
 } from '../lib';
 
 interface IProps {
@@ -38,27 +39,46 @@ const dayDiff = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / M
 /** Раскладка спринтов: x, y, width, height */
 const sprintLayouts = computed<IGanttSprintBar[]>(() => {
     const layouts: IGanttSprintBar[] = [];
-    let cursorY = 0;
+    const sprintsList = sprintsSource.sprints.value;
 
-    for (const sprint of sprintsSource.sprints.value) {
+    // высота = максимум по спринтам, а не сумма
+    const maxTasks = Math.max(1, ...sprintsList.map((s) => s.tasks.length));
+    const chartHeight = HEADER_HEIGHT + maxTasks * timescale.dayHeight.value;
+
+    for (const [index, sprint] of sprintsList.entries()) {
         const b = sprintsSource.sprintBounds(sprint);
-        const days = b.start && b.end ? dayDiff(b.start, b.end) + 1 : 1;
 
-        const x = b.start ? timescale.dateToX(b.start) : 0;
-        const tasksHeight = Math.max(sprint.tasks.length, 1) * timescale.dayHeight.value;
-        const height = HEADER_HEIGHT + tasksHeight;
+        let x: number;
+        let days: number;
+        if (b.start && b.end) {
+            x = timescale.dateToX(b.start);
+            days = dayDiff(b.start, b.end) + 1;
+        } else {
+            let latest: Date | null = null;
+            for (const other of sprintsList) {
+                if (other.id === sprint.id) continue;
+                for (const t of other.tasks) {
+                    const d = new Date(t.deadline_at);
+                    d.setHours(0, 0, 0, 0);
+                    if (!latest || d > latest) latest = d;
+                }
+            }
+            const start = latest ? new Date(latest.getTime() + MS_PER_DAY) : new Date();
+            x = timescale.dateToX(start);
+            days = 7;
+        }
 
         layouts.push({
             id: sprint.id,
             name: sprint.name,
             x,
-            y: cursorY,
+            y: 0, // ← все спринты с top 0
             days,
-            height,
+            height: chartHeight, // ← все на всю высоту
             headerHeight: HEADER_HEIGHT,
             status: sprint.status,
+            color: getSprintColor(index),
         });
-        cursorY += height + 8; // отступ между спринтами
     }
     return layouts;
 });
@@ -100,7 +120,7 @@ const bars = computed<IGanttBar[]>(() => {
                 name: task.name,
                 description: task.description,
                 x,
-                y: layout.y + layout.headerHeight + i * timescale.dayHeight.value,
+                y: HEADER_HEIGHT + i * timescale.dayHeight.value, // ← было layout.y + layout.headerHeight + i * dayHeight
                 days,
                 status: task.status,
                 next_task_id: task.next_task_id,
@@ -168,9 +188,10 @@ const totalWidth = computed(() => {
     );
     return Math.max(w1, w2);
 });
+
 const totalHeight = computed(() => {
-    const last = sprintLayouts.value[sprintLayouts.value.length - 1];
-    return (last ? last.y + last.height : 0) + 16;
+    const maxTasks = Math.max(1, ...sprintsSource.sprints.value.map((s) => s.tasks.length));
+    return HEADER_HEIGHT + maxTasks * timescale.dayHeight.value + 16;
 });
 
 const isItToday = (month: IMonth, day: number) => {
@@ -182,7 +203,7 @@ const isItToday = (month: IMonth, day: number) => {
 </script>
 
 <template>
-  <div class="flex w-full relative min-h-80">
+  <div class="flex w-full relative">
     <!-- сетка -->
     <div class="absolute inset-0 flex">
       <div
@@ -211,17 +232,20 @@ const isItToday = (month: IMonth, day: number) => {
       <div
         v-for="sprint in sprintLayouts"
         :key="`sprint-${sprint.id}`"
-        class="absolute rounded-lg border-2 border-dashed border-slate-400 bg-slate-100/60 pointer-events-none"
+        class="absolute top-0 bottom-0 rounded-lg border-2 border-dashed pointer-events-none"
         :style="{
           left: sprint.x + 'px',
-          top: sprint.y + 'px',
           width: sprint.days * timescale.dayWidth.value + 'px',
-          height: sprint.height + 'px',
+          borderColor: sprint.color.border,
+          backgroundColor: sprint.color.bg,
         }"
       >
         <div
-          class="flex items-center px-2 font-semibold text-slate-700"
-          :style="{ height: sprint.headerHeight + 'px' }"
+          class="flex items-center px-2 font-semibold"
+          :style="{
+            height: sprint.headerHeight + 'px',
+            color: sprint.color.text,
+          }"
         >
           {{ sprint.name }}
         </div>

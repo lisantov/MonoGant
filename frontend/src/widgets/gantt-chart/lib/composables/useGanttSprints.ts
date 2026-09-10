@@ -1,5 +1,5 @@
 import { ref, computed, watch, toValue, type MaybeRefOrGetter } from 'vue';
-import { MS_PER_DAY, type IGanttSprint, type IGanttTask } from '../types';
+import { GANTT_TASK_STATUS, MS_PER_DAY, type IGanttSprint, type IGanttTask } from '../types';
 import type { TimeScale } from '../injection';
 import { sortByChains } from '../utils';
 
@@ -66,6 +66,76 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
                     return { ...t, started_at: fmt(start), deadline_at: fmt(end) };
                 }),
             };
+        });
+    };
+
+    /** Создать пустой спринт */
+    const addSprint = (name: string, id?: number) => {
+        const newId = id ?? Math.max(0, ...sprints.value.map((s) => s.id)) + 1;
+        sprints.value = [
+            ...sprints.value,
+            {
+                id: newId,
+                name: name.trim() || `Спринт ${newId}`,
+                description: '',
+                status: GANTT_TASK_STATUS.PLANNED,
+                tasks: [],
+            },
+        ];
+        return newId;
+    };
+
+    /** Добавить задачу в спринт */
+    const addTask = (sprintId: number, task: Partial<IGanttTask> = {}) => {
+        sprints.value = sprints.value.map((s) => {
+            if (s.id !== sprintId) return s;
+
+            // ── вычисляем «сегодня» и «завтра» как fallback ──
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const fmtDate = (d: Date) =>
+                `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+            // ── если спринт пуст — начинаем со дня после последнего спринта ──
+            let defaultStart = today;
+            if (s.tasks.length === 0) {
+                // ищем самый поздний deadline_at среди задач ДРУГИХ спринтов
+                let latest: Date | null = null;
+                for (const other of sprints.value) {
+                    if (other.id === sprintId) continue;
+                    for (const t of other.tasks) {
+                        const d = new Date(t.deadline_at);
+                        d.setHours(0, 0, 0, 0);
+                        if (!latest || d > latest) latest = d;
+                    }
+                }
+                if (latest) {
+                    defaultStart = new Date(latest);
+                    defaultStart.setDate(defaultStart.getDate() + 1);
+                }
+            }
+
+            const defaultEnd = new Date(defaultStart);
+            defaultEnd.setDate(defaultEnd.getDate() + 1); // 2-дневная задача по умолчанию
+
+            const localId = Math.max(0, ...s.tasks.map((t) => t.id)) + 1;
+            const globalId =
+                Math.max(0, ...sprints.value.flatMap((x) => x.tasks.map((t) => t.id))) + 1;
+
+            const newTask: IGanttTask = {
+                id: globalId,
+                name: task.name ?? `Задача ${localId}`,
+                description: task.description ?? '',
+                started_at: task.started_at ?? fmtDate(defaultStart),
+                deadline_at: task.deadline_at ?? fmtDate(defaultEnd),
+                status: task.status ?? GANTT_TASK_STATUS.PLANNED,
+                next_task_id: task.next_task_id ?? null,
+            };
+
+            return { ...s, tasks: [...s.tasks, newTask] };
         });
     };
 
@@ -137,6 +207,8 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
     return {
         sprints,
         allTasks,
+        addSprint,
+        addTask,
         sprintBounds,
         moveSprint,
         refreshSprintDates,
