@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { registerSchema } from '@/features';
+import { AppButton, AppInput } from '@/shared';
 
 const { defineField, errors } = useForm({
     validationSchema: registerSchema,
 });
-
-// const { mutateAsync, isLoading } = useRegister()
 
 const [name, nameAttrs] = defineField('name');
 const [email, emailAttrs] = defineField('email');
@@ -16,11 +15,10 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 // const onSubmit = handleSubmit((values) => {
 //   mutateAsync(values)
 // })
-import { AppButton, AppInput } from '@/shared';
 </script>
 
 <template>
-  <form class="flex flex-col justify-center">
+  <form class="flex flex-col justify-center gap-6">
     <h2 class="text-[60px] text-white font-jost font-semibold text-center">
       Создание аккаунта
     </h2>
@@ -50,10 +48,6 @@ import { AppButton, AppInput } from '@/shared';
         v-bind="confirmPasswordAttrs"
       />
     </div>
-    <div>
-      <app-button> Регистрация </app-button>
-    </div>
+    <app-button> Регистрация </app-button>
   </form>
 </template>
-
-<style scoped lang="scss"></style>
