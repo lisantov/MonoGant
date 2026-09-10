@@ -34,12 +34,14 @@ class Task extends Model
 
     public function predecessors(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class, 'task_dependencies', 'successor_task_id', 'predecessor_task_id');
+        return $this->belongsToMany(Task::class, 'task_dependencies', 'successor_task_id', 'predecessor_task_id')
+            ->withTimestamps();
     }
 
     public function successors(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class, 'task_dependencies', 'predecessor_task_id', 'successor_task_id');
+        return $this->belongsToMany(Task::class, 'task_dependencies', 'predecessor_task_id', 'successor_task_id')
+            ->withTimestamps();
     }
 
     public function sprint(): BelongsTo

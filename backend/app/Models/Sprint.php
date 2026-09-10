@@ -33,12 +33,14 @@ class Sprint extends Model
 
     public function predecessors(): BelongsToMany
     {
-        return $this->belongsToMany(Sprint::class, 'sprint_dependencies', 'successor_sprint_id', 'predecessor_sprint_id');
+        return $this->belongsToMany(Sprint::class, 'sprint_dependencies', 'successor_sprint_id', 'predecessor_sprint_id')
+            ->withTimestamps();
     }
 
     public function successors(): BelongsToMany
     {
-        return $this->belongsToMany(Sprint::class, 'sprint_dependencies', 'predecessor_sprint_id', 'successor_sprint_id');
+        return $this->belongsToMany(Sprint::class, 'sprint_dependencies', 'predecessor_sprint_id', 'successor_sprint_id')
+            ->withTimestamps();
     }
 
     public function project(): BelongsTo

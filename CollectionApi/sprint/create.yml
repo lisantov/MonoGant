@@ -1,0 +1,22 @@
+info:
+  name: create
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}{{prefix}}/projects/1/sprints"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "sprint"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

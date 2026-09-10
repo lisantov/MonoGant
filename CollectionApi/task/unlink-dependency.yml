@@ -1,0 +1,22 @@
+info:
+  name: unlink-dependency
+  type: http
+  seq: 7
+
+http:
+  method: DELETE
+  url: "{{host}}{{prefix}}/tasks/1/dependencies"
+  body:
+    type: json
+    data: |-
+      {
+        "successor_id": 2
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
