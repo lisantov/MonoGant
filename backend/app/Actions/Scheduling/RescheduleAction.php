@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Перебалансирует раскид после привязки задачи или изменения ее дат.
+ * Перебалансирует расклад после привязки задачи или изменения ее дат.
  *
- *  Связанные задачи (те, у которых есть next_task_id или предшественник) передвигаются вперед.
- *  таким образом, каждый преемник начинает работу в срок своего предшественника, используя наименьший срок
- *  сдвига (как башенка). Неприкрепленные задачи никогда не перемещаются и могут перекрываться. Если
- *  дедлайн переходит в следующий спринт, то следуюущие
- *  задачи этого спринта сдвигаются на минимальную величину, чтобы восстановить нулевой разрыв.
+ * Связанные задачи (те, у которых есть next_task_id или предшественник) образуют сплошную
+ * цепочку Ганта без зазоров: каждый преемник начинается ровно с дедлайна предшественника
+ * (перекрытие сдвигается вперёд, ручной гэп стягивается назад), длительность задачи сохраняется.
+ * Спринт рассматривается как блок: его рамка охватывает ВСЕ задачи спринта. Когда конец блока
+ * переходит в следующий спринт, весь следующий блок сдвигается на минимальную величину (zero-gap),
+ * чтобы ни одна задача не вылезала за рамки своего спринта.
  */
 class RescheduleAction
 {
@@ -47,7 +48,7 @@ class RescheduleAction
         $deadline = $predecessor->deadline_at;
         $start = $anchor->started_at;
 
-        if ($deadline === null || ($start !== null && ! $start->lt($deadline))) {
+        if ($deadline === null || ($start !== null && $start->equalTo($deadline))) {
             return false;
         }
 
@@ -71,7 +72,7 @@ class RescheduleAction
             $deadline = $previous->deadline_at;
             $start = $current->started_at;
 
-            if ($deadline === null || ($start !== null && ! $start->lt($deadline))) {
+            if ($deadline === null || ($start !== null && $start->equalTo($deadline))) {
                 break;
             }
 
@@ -109,34 +110,23 @@ class RescheduleAction
         while ($current !== null && ! isset($visited[$current->id])) {
             $visited[$current->id] = true;
 
-            $chains = $this->chainedChains($current);
+            $tasks = $current->tasks;
+            $earliestStart = $this->earliestStart($tasks);
 
-            if ($chains->isNotEmpty()) {
-                if ($previousEnd === null) {
-                    $previousEnd = $this->maxDeadline($chains->flatten(1));
-                } else {
-                    foreach ($chains as $tasks) {
-                        $headStart = $tasks->first()->started_at;
+            if ($earliestStart !== null) {
+                if ($previousEnd !== null && $earliestStart->lt($previousEnd)) {
+                    $shiftDays = max(1, (int) ceil(abs($previousEnd->diffInDays($earliestStart))));
 
-                        if ($headStart === null) {
-                            continue;
-                        }
-
-                        if ($headStart->lt($previousEnd)) {
-                            $shiftDays = max(1, (int) ceil(abs($previousEnd->diffInDays($headStart))));
-
-                            foreach ($tasks as $task) {
-                                $baseStart = $task->started_at ?? $headStart;
-                                $this->shiftTask($task, $baseStart->copy()->addDays($shiftDays));
-                            }
-                        }
-
-                        $end = $this->maxDeadline($tasks);
-
-                        if ($end !== null) {
-                            $previousEnd = $previousEnd->greaterThanOrEqualTo($end) ? $previousEnd : $end;
-                        }
+                    foreach ($tasks as $task) {
+                        $baseStart = $task->started_at ?? $earliestStart;
+                        $this->shiftTask($task, $baseStart->copy()->addDays($shiftDays));
                     }
+                }
+
+                $end = $this->maxDeadline($tasks);
+
+                if ($end !== null) {
+                    $previousEnd = $previousEnd === null || $end->greaterThan($previousEnd) ? $end : $previousEnd;
                 }
             }
 
@@ -147,39 +137,19 @@ class RescheduleAction
     }
 
     /**
-     * @return Collection<int, Collection<int, Task>>
+     * @param  Collection<int, Task>  $tasks
      */
-    private function chainedChains(Sprint $sprint): Collection
+    private function earliestStart(Collection $tasks): ?Carbon
     {
-        $tasks = $sprint->tasks;
-        $ids = $tasks->pluck('id');
-        $referencedIds = Task::whereIn('next_task_id', $ids)->pluck('next_task_id');
+        return $tasks->reduce(function (?Carbon $carry, Task $task): ?Carbon {
+            $start = $task->started_at;
 
-        $chained = $tasks->filter(
-            fn (Task $task) => $task->next_task_id !== null || $referencedIds->contains($task->id)
-        );
-
-        $byId = $chained->keyBy('id');
-        $heads = $chained
-            ->reject(fn (Task $task) => $referencedIds->contains($task->id))
-            ->sortBy(fn (Task $task) => $task->started_at?->timestamp ?? PHP_INT_MAX)
-            ->values();
-
-        return $heads->map(function (Task $head) use ($byId): Collection {
-            $tasks = collect([$head]);
-            $guard = [$head->id => true];
-            $current = $head;
-
-            while ($current->next_task_id !== null
-                && isset($byId[$current->next_task_id])
-                && ! isset($guard[$current->next_task_id])) {
-                $current = $byId[$current->next_task_id];
-                $guard[$current->id] = true;
-                $tasks->push($current);
+            if ($start === null) {
+                return $carry;
             }
 
-            return $tasks;
-        });
+            return $carry === null || $start->lessThan($carry) ? $start : $carry;
+        }, null);
     }
 
     /**

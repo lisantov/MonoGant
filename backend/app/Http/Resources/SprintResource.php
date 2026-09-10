@@ -17,8 +17,8 @@ class SprintResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'started_at' => $this->started_at()->toDateString(),
-            'deadline_at' => $this->deadline_at()->toDateString(),
+            'started_at' => $this->started_at() ? $this->started_at()->toDateString() : null,
+            'deadline_at' => $this->started_at() ? $this->deadline_at()->toDateString() : null,
             'status' => $this->status,
             'description' => $this->description,
             'next_sprint_id' => $this->next_sprint_id,

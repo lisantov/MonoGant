@@ -52,6 +52,21 @@ class UpdateTaskRequest extends FormRequest
             if (Carbon::parse($deadlineAt)->lt(Carbon::parse($startedAt))) {
                 $validator->errors()->add('deadline_at', 'The deadline date must be on or after the start date.');
             }
+
+            $sprint = $existing?->sprint;
+
+            if ($sprint === null) {
+                return;
+            }
+
+            $conflict = $sprint->dateRangeConflict(
+                Carbon::parse($startedAt),
+                Carbon::parse($deadlineAt),
+            );
+
+            if ($conflict !== null) {
+                $validator->errors()->add('deadline_at', $conflict);
+            }
         });
     }
 }
