@@ -1,40 +1,59 @@
 <script setup lang="ts">
-// import { registerSchema } from '@/features';
-// import {useForm} from "vee-validate";
+import { useForm } from 'vee-validate';
+import { registerSchema } from '@/features';
 
-// const { defineField, handleSubmit, errors, meta } = useForm({
-//   validationSchema: registerSchema,
-// })
+const { defineField, errors } = useForm({
+    validationSchema: registerSchema,
+});
 
 // const { mutateAsync, isLoading } = useRegister()
 
-// const [username, usernameAttrs] = defineField("username")
-// const [email, emailAttrs] = defineField("email")
-// const [password, passwordAttrs] = defineField("password")
-// const [confirmPassword, confirmPasswordAttrs] = defineField("confirmPassword")
+const [name, nameAttrs] = defineField('name');
+const [email, emailAttrs] = defineField('email');
+const [password, passwordAttrs] = defineField('password');
+const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 
 // const onSubmit = handleSubmit((values) => {
 //   mutateAsync(values)
 // })
+import { AppButton, AppInput } from '@/shared';
 </script>
 
 <template>
-  <div>
-    <form>
-      <label for="name">
-        <input>
-      </label>
-      <label for="email">
-        <input>
-      </label>
-      <label for="password">
-        <input>
-      </label>
-      <label for="confirmPassword">
-        <input>
-      </label>
-    </form>
-  </div>
+  <form class="flex flex-col items-center justify-center gap-15">
+    <h2 class="text-[32px] text-center">
+      Регистрация
+    </h2>
+    <div class="flex flex-col items-center justify-center gap-5">
+      <app-input
+        v-model="name"
+        placeholder="Имя"
+        :error="errors.name"
+        v-bind="nameAttrs"
+      />
+      <app-input
+        v-model="email"
+        placeholder="Почта"
+        :error="errors.email"
+        v-bind="emailAttrs"
+      />
+      <app-input
+        v-model="password"
+        placeholder="Пароль"
+        :error="errors.password"
+        v-bind="passwordAttrs"
+      />
+      <app-input
+        v-model="confirmPassword"
+        placeholder="Повторите пароль"
+        :error="errors.confirmPassword"
+        v-bind="confirmPasswordAttrs"
+      />
+    </div>
+    <div>
+      <app-button> Регистрация </app-button>
+    </div>
+  </form>
 </template>
 
 <style scoped lang="scss"></style>

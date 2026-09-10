@@ -17,6 +17,11 @@ const router = createRouter({
             component: () => import('@/pages/login/LoginPage.vue'),
         },
         {
+            path: Routes.register.path,
+            name: Routes.register.name,
+            component: () => import('@/pages/register/RegisterPage.vue'),
+        },
+        {
             path: Routes.notFound.path,
             name: Routes.notFound.name,
             component: () => import('@/pages/not-found.vue'),

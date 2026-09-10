@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const usernameValid = z
+export const nameValid = z
     .string()
     .min(1, 'Минимум 1 символов')
     .regex(/^[А-Яа-яЁёA-Za-z0-9\s!#%*+\-\/=?_~.,$]+$/, 'Недопустимые символы')

@@ -4,7 +4,7 @@ import { inputVariants, type InputVariants } from '@/shared';
 
 interface Props {
     size?: InputVariants['size'];
-    error?: InputVariants['error'];
+    error?: string | boolean;
     disabled?: boolean;
     modelValue?: string;
     type?: 'text' | 'email' | 'password' | 'tel' | 'number';
@@ -20,20 +20,29 @@ withDefaults(defineProps<Props>(), {
     error: false,
 });
 
+const model = defineModel<string>();
+
 defineEmits<{
     'update:modelValue': [value: string];
 }>();
 </script>
 
 <template>
-  <input
-    v-maska
-    :data-maska="mask"
-    :type="type"
-    :value="modelValue"
-    :placeholder="placeholder"
-    :disabled="disabled"
-    :class="inputVariants({ size, error, disabled })"
-    @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-  >
+  <div>
+    <p v-if="error">
+      {{ error ?? 'нет' }}
+    </p>
+    <label>
+      <input
+        v-model="model"
+        v-maska
+        :data-maska="mask"
+        :type="type"
+        :value="modelValue"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :class="inputVariants({ size, error, disabled })"
+      >
+    </label>
+  </div>
 </template>

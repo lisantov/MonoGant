@@ -1,10 +1,10 @@
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import { emailValid, passwordValid, usernameValid } from '@/shared';
+import { emailValid, passwordValid, nameValid } from '@/shared';
 
 const registrationSchemaRaw = z
     .object({
-        username: usernameValid,
+        name: nameValid,
         email: emailValid,
         password: passwordValid,
         confirmPassword: z.string(),
