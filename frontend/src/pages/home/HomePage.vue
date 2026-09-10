@@ -2,6 +2,12 @@
   <section class="relative w-full overflow-x-hidden text-white">
     <div class="flex mx-auto min-h-screen max-w-6xl items-center gap-20">
       <div class="space-y-12">
+        <app-button
+          variant-button="solid"
+          @click="openModal('mini')"
+        >
+          Модалка
+        </app-button>
         <h1
           class="text-5xl leading-tight font-extrabold tracking-tight md:text-6xl lg:text-7xl xl:text-8xl"
         >
@@ -96,12 +102,14 @@
           </ul>
         </div>
       </div>
+      <AppMiniModal />
     </div>
   </section>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { AppButton } from '@/shared';
+import { AppButton, AppMiniModal, useModal } from '@/shared';
+const { openModal } = useModal();
 
 const router = useRouter();
 </script>
