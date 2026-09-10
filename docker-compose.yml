@@ -1,18 +1,91 @@
 services:
+  backend:
+    build:
+      dockerfile: ./deploy/php/Dockerfile
+    container_name: backend
+    depends_on:
+      - database
+    environment:
+      - APP_NAME=${APP_NAME}
+      - APP_ENV=${APP_ENV}
+      - APP_DEBUG=${APP_DEBUG}
+      - APP_URL=${APP_URL}
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - CACHE_STORE=${CACHE_STORE}
+      - QUEUE_CONNECTION=${QUEUE_CONNECTION}
+      - SESSION_DRIVER=${SESSION_DRIVER}
+    volumes:
+      - ./backend:/var/www
+      - backend_vendor:/var/www/vendor
+    networks:
+      - app-network
+      - database
+
+  nginx:
+    build:
+      context: ./deploy/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    container_name: nginx
+    volumes:
+      - ./deploy/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./backend:/var/www
+    networks:
+      - app-network
+    depends_on:
+      - backend
+  
+  database:
+    image: postgres:17-alpine3.23
+    networks:
+      - database
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/17/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: always
+
+
   frontend:
-    container_name: frontend
     build:
       context: ./frontend
-      dockerfile: ./Dockerfile
+      dockerfile: ../deploy/node/Dockerfile
+    container_name: frontend
     working_dir: /app
+    environment:
+      - VITE_APP_NAME=${VITE_APP_NAME}
+      - VITE_API_URL=/api/
     volumes:
       - ./frontend:/app
       - /app/node_modules
     ports:
       - "5173:5173"
     networks:
-      - client-net
+      - app-network
 
 networks:
-  client-net:
+  app-network:
     driver: bridge
+  database:
+    driver: bridge
+
+volumes:
+  database_data:
+  backend_vendor:
