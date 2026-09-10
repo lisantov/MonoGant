@@ -23,6 +23,7 @@ class ProjectResource extends JsonResource
             'deadline_at' => $this->deadline_at,
             'status' => $this->status,
             'owner' => $owner ? new UserResource($owner) : null,
+            'members' => UserResource::collection($this->members),
         ];
     }
 }

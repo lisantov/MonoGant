@@ -17,10 +17,11 @@ class SprintResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'started_at' => $this->started_at,
-            'deadline_at' => $this->deadline_at,
+            'started_at' => $this->started_at(),
+            'deadline_at' => $this->deadline_at(),
             'status' => $this->status,
             'description' => $this->description,
+            'next_sprint_id' => $this->next_sprint_id,
         ];
     }
 }

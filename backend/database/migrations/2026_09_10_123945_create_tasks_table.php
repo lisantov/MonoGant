@@ -21,16 +21,9 @@ return new class extends Migration
             $table->enum('status', StatusEnum::cases())->default('planned');
             $table->foreignId('sprint_id')->constrained('sprints')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('next_task_id')->nullable()->constrained('tasks')->nullOnDelete();
+            $table->unique('next_task_id');
             $table->timestamps();
-        });
-
-        Schema::create('task_dependencies', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('predecessor_task_id')->constrained('tasks')->cascadeOnDelete();
-            $table->foreignId('successor_task_id')->constrained('tasks')->cascadeOnDelete();
-            $table->timestamps();
-
-            $table->unique(['predecessor_task_id', 'successor_task_id']);
         });
     }
 
@@ -39,7 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('task_dependencies');
         Schema::dropIfExists('tasks');
     }
 };

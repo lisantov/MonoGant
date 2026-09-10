@@ -15,6 +15,10 @@ class CommentController extends Controller
 {
     public function index(Task $task)
     {
+        if (! Gate::inspect('project-show', $task->sprint->project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return CommentResource::collection($task->comments);
     }
 
@@ -32,6 +36,10 @@ class CommentController extends Controller
 
     public function show(Comment $comment)
     {
+        if (! Gate::inspect('project-show', $comment->task->sprint->project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return new CommentResource($comment);
     }
 

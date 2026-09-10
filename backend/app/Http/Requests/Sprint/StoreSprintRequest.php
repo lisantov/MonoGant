@@ -22,10 +22,13 @@ class StoreSprintRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:sprints,name'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('sprints', 'name')->where(fn ($query) => $query->where('project_id', $this->route('project')->id)),
+            ],
             'description' => ['nullable', 'string'],
-            'started_at' => ['nullable', 'date'],
-            'deadline_at' => ['nullable', 'date'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
         ];
     }

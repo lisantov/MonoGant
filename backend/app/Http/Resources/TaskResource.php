@@ -23,7 +23,8 @@ class TaskResource extends JsonResource
             'deadline_at' => $this->deadline_at,
             'status' => $this->status,
             'sprint_id' => $this->sprint_id,
-            'user_id' => new UserResource(User::find($this->user_id)),
+            'next_task_id' => $this->next_task_id,
+            'user' => new UserResource(User::find($this->user_id)),
         ];
     }
 }

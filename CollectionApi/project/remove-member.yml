@@ -1,17 +1,11 @@
 info:
-  name: unlink-dependency
+  name: remove-member
   type: http
-  seq: 7
+  seq: 8
 
 http:
   method: DELETE
-  url: "{{host}}{{prefix}}/sprints/1/dependencies"
-  body:
-    type: json
-    data: |-
-      {
-        "successor_id": 2
-      }
+  url: "{{host}}{{prefix}}/projects/1/members/2"
   auth: inherit
 
 settings:

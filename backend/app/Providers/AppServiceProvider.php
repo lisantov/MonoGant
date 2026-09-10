@@ -45,10 +45,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         /**
-         * User can update project (owner)
+         * User can edit project content (owner or responsible)
          */
-        Gate::define('project-update', function (User $user, Project $project) {
-            return Gate::forUser($user)->allows('project-owner', $project);
+        Gate::define('project-edit', function (User $user, Project $project) {
+            return $project->members()
+                ->where('user_id', $user->id)
+                ->whereIn('role', [RoleEnum::Owner, RoleEnum::Responsible])
+                ->exists();
         });
 
         /**
@@ -56,6 +59,27 @@ class AppServiceProvider extends ServiceProvider
          */
         Gate::define('project-delete', function (User $user, Project $project) {
             return Gate::forUser($user)->allows('project-owner', $project);
+        });
+
+        /**
+         * User can invite members (owner or responsible)
+         */
+        Gate::define('project-invite', function (User $user, Project $project) {
+            return Gate::forUser($user)->allows('project-edit', $project);
+        });
+
+        /**
+         * User can set member roles (owner)
+         */
+        Gate::define('project-set-role', function (User $user, Project $project) {
+            return Gate::forUser($user)->allows('project-owner', $project);
+        });
+
+        /**
+         * User can remove members (owner or responsible)
+         */
+        Gate::define('project-remove-member', function (User $user, Project $project) {
+            return Gate::forUser($user)->allows('project-edit', $project);
         });
     }
 }

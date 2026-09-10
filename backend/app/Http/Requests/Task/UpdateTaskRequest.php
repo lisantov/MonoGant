@@ -27,7 +27,8 @@ class UpdateTaskRequest extends FormRequest
             'started_at' => ['nullable', 'date'],
             'deadline_at' => ['nullable', 'date'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
-            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'user_email' => ['nullable', 'email', 'exists:users,email'],
+            'next_task_id' => ['nullable', 'integer', 'exists:tasks,id'],
         ];
     }
 }

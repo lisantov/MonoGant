@@ -5,10 +5,10 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TaskController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', [\App\Http\Controllers\UserController::class, 'profile'])->middleware('auth:sanctum');
+Route::get('/user', [UserController::class, 'profile'])->middleware('auth:sanctum');
 
 Route::get('/hi', [AuthController::class, 'index']);
 
@@ -28,6 +28,9 @@ Route::group(['prefix' => '/projects/', 'middleware' => 'auth:sanctum'], functio
     Route::get('{project}', [ProjectController::class, 'show'])
         ->where(['id' => '[0-9]+']);
     Route::get('parse/{project}', [ProjectController::class, 'parse']);
+    Route::post('/{project}/members', [ProjectController::class, 'storeMembers']);
+    Route::patch('/{project}/members/{member}', [ProjectController::class, 'setMemberRole']);
+    Route::delete('/{project}/members/{member}', [ProjectController::class, 'removeMember']);
 });
 
 // Sprints
@@ -40,8 +43,6 @@ Route::group(['prefix' => '/sprints', 'middleware' => 'auth:sanctum'], function 
     Route::get('/{sprint}', [SprintController::class, 'show']);
     Route::patch('/{sprint}', [SprintController::class, 'update']);
     Route::delete('/{sprint}', [SprintController::class, 'destroy']);
-    Route::post('/{sprint}/dependencies', [SprintController::class, 'linkDependency']);
-    Route::delete('/{sprint}/dependencies', [SprintController::class, 'unlinkDependency']);
 });
 
 // Tasks
@@ -54,8 +55,6 @@ Route::group(['prefix' => '/tasks', 'middleware' => 'auth:sanctum'], function ()
     Route::get('/{task}', [TaskController::class, 'show']);
     Route::patch('/{task}', [TaskController::class, 'update']);
     Route::delete('/{task}', [TaskController::class, 'destroy']);
-    Route::post('/{task}/dependencies', [TaskController::class, 'linkDependency']);
-    Route::delete('/{task}/dependencies', [TaskController::class, 'unlinkDependency']);
 });
 
 // Comments

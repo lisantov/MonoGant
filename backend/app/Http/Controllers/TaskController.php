@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Task\AddTaskDependencyAction;
 use App\Actions\Task\CreateTaskAction;
-use App\Actions\Task\RemoveTaskDependencyAction;
 use App\Actions\Task\UpdateTaskAction;
-use App\Http\Requests\Task\RemoveTaskDependencyRequest;
-use App\Http\Requests\Task\StoreTaskDependencyRequest;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
@@ -20,6 +16,10 @@ class TaskController extends Controller
 {
     public function index(Sprint $sprint)
     {
+        if (! Gate::inspect('project-show', $sprint->project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return TaskResource::collection($sprint->tasks);
     }
 
@@ -37,14 +37,35 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
+        if (! Gate::inspect('project-show', $task->sprint->project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return new TaskResource($task);
     }
 
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $this->authorizeSprint($task->sprint);
+        $project = $task->sprint->project;
+        $validated = $request->validated();
 
-        $task = UpdateTaskAction::run($task, $request->validated());
+        if (! Gate::inspect('project-member', $project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
+        if (Gate::inspect('project-edit', $project)->allowed()) {
+            $task = UpdateTaskAction::run($task, $validated);
+        } else {
+            if ($task->user_id !== $request->user()->id) {
+                throw new AccessDeniedHttpException;
+            }
+
+            if (array_diff(array_keys($validated), ['status']) !== []) {
+                throw new AccessDeniedHttpException;
+            }
+
+            $task = UpdateTaskAction::run($task, $validated);
+        }
 
         return response()->json([
             'message' => 'Task updated successfully',
@@ -63,31 +84,9 @@ class TaskController extends Controller
         ]);
     }
 
-    public function linkDependency(StoreTaskDependencyRequest $request, Task $task)
-    {
-        $this->authorizeSprint($task->sprint);
-
-        AddTaskDependencyAction::run($task, $request->validated());
-
-        return response()->json([
-            'message' => 'Dependency linked successfully',
-        ]);
-    }
-
-    public function unlinkDependency(RemoveTaskDependencyRequest $request, Task $task)
-    {
-        $this->authorizeSprint($task->sprint);
-
-        RemoveTaskDependencyAction::run($task, $request->validated());
-
-        return response()->json([
-            'message' => 'Dependency unlinked successfully',
-        ]);
-    }
-
     private function authorizeSprint(Sprint $sprint): void
     {
-        if (! Gate::inspect('project-member', $sprint->project)->allowed()) {
+        if (! Gate::inspect('project-edit', $sprint->project)->allowed()) {
             throw new AccessDeniedHttpException;
         }
     }
