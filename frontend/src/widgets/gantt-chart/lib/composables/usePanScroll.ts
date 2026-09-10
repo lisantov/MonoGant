@@ -1,7 +1,6 @@
 import { onBeforeUnmount, ref } from 'vue';
 
 interface Options {
-    /** селектор или предикат: если true — панорамирование не запускаем */
     shouldIgnore?: (target: HTMLElement) => boolean;
 }
 
