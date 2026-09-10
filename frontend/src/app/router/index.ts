@@ -17,6 +17,11 @@ const router = createRouter({
             component: () => import('@/pages/login/LoginPage.vue'),
         },
         {
+            path: Routes.gantt.path,
+            name: Routes.gantt.name,
+            component: () => import('@/pages/gantt/GanttTestPage.vue'),
+        },
+        {
             path: Routes.notFound.path,
             name: Routes.notFound.name,
             component: () => import('@/pages/not-found.vue'),

@@ -1,0 +1,1 @@
+export { useGanttBarResize } from './useGanttBarResize';

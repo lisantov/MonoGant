@@ -7,6 +7,10 @@ export const Routes = {
         path: '/auth/login',
         name: 'login',
     },
+    gantt: {
+        path: '/gantt',
+        name: 'gantt',
+    },
     notFound: {
         path: '/:pathMatch(.*)*',
         name: 'notFound',
