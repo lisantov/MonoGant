@@ -31,13 +31,6 @@
         <div
           class="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-9 backdrop-blur-xl"
         >
-          <div
-            class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white/70"
-          >
-            <span class="h-2 w-2 rounded-full bg-accent-base" />
-            Начало работы
-          </div>
-
           <h2 class="mb-3 text-2xl leading-snug font-bold">
             Создайте первый проект<br>
             и запустите работу
