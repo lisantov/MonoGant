@@ -1,0 +1,25 @@
+info:
+  name: add-members
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{host}}{{prefix}}/projects/1/members"
+  body:
+    type: json
+    data: |-
+      {
+        "emails": [
+          "email2@email.com",
+          "email23@email.com"    
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

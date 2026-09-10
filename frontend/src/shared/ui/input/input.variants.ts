@@ -1,24 +1,19 @@
 import { tv, type VariantProps } from 'tailwind-variants';
 
 export const inputVariants = tv({
-    base: 'w-full rounded-lg border bg-white px-4 transition-colors duration-200 outline-none placeholder:text-gray-400',
+    base: 'flex bg-dark-gray font-montserrat justify-center items-center w-full gap-4 text-white placeholder:font-montserrat placeholder:text-input-placeholder px-5 py-5.5 bg-transparent rounded-2xl border-2 border-input-outline transition duration-300 text-lg placeholder:text-lg hover:placeholder:text-placeholder-hover hover:bg-white/5 hover:shadow-[0_0_12px_1px_rgba(2,255,11,0.3)] active:placeholder:text-placeholder-active active:bg-white/10 disabled:cursor-not-allowed disabled:pointer-events-none disabled:opacity-50 focus-within:shadow-[0_0_20px_1px_rgba(2,255,11,0.3)]',
     variants: {
-        size: {
-            sm: 'h-8 text-sm',
-            md: 'h-10 text-base',
-            lg: 'h-12 text-lg',
-        },
         error: {
-            true: 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500',
-            false: 'border-gray-300 focus:border-brand focus:ring-1 focus:ring-brand',
+            true: 'text-error placeholder:text-error/50 border-error hover:placeholder:text-initial hover:shadow-[0_0_12px_3px_rgba(218,43,43,0.4)] active:placeholder:text-initial focus-within:shadow-[0_0_20px_3px_rgba(218,43,43,0.6)]',
+            false: '',
         },
         disabled: {
-            true: 'bg-gray-100 cursor-not-allowed opacity-50',
+            true: 'bg-surface-soft cursor-not-allowed opacity-50',
         },
     },
     defaultVariants: {
-        size: 'md',
         error: false,
+        disabled: false,
     },
 });
 

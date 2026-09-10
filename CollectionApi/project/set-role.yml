@@ -1,0 +1,22 @@
+info:
+  name: set-role
+  type: http
+  seq: 7
+
+http:
+  method: PATCH
+  url: "{{host}}{{prefix}}/projects/1/members/2"
+  body:
+    type: json
+    data: |-
+      {
+        "role": "responsible"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

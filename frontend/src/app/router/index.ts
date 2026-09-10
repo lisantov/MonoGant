@@ -12,6 +12,11 @@ const router = createRouter({
             component: () => import('@/pages/home/HomePage.vue'),
         },
         {
+            path: Routes.main.path,
+            name: Routes.main.name,
+            component: () => import('@/pages/main/MainPage.vue'),
+        },
+        {
             path: Routes.login.path,
             name: Routes.login.name,
             component: () => import('@/pages/login/LoginPage.vue'),
@@ -20,6 +25,9 @@ const router = createRouter({
             path: Routes.gantt.path,
             name: Routes.gantt.name,
             component: () => import('@/pages/gantt/GanttTestPage.vue'),
+            path: Routes.register.path,
+            name: Routes.register.name,
+            component: () => import('@/pages/register/RegisterPage.vue'),
         },
         {
             path: Routes.notFound.path,
