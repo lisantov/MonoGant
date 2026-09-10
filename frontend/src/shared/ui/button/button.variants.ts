@@ -1,28 +1,36 @@
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv } from 'tailwind-variants';
 
 export const buttonVariants = tv({
-    base: 'inline-flex text-2xl items-center justify-center rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
+    base:
+        'flex items-center justify-center w-full box-border min-w-fit' +
+        ' disabled:cursor-default hover:cursor-pointer' +
+        ' p-5 ' +
+        ' font-montserrat text-white text-xl font-semibold' +
+        ' [box-shadow:0_0_4px_0px_rgba(2,255,11,0.2)]' +
+        ' transition-colors duration-200 ease-out' +
+        ' border-2 border-accent-base rounded-2xl' +
+        ' bg-linear-to-r from-accent-light to-accent-dark' +
+        ' hover:from-accent-lighter hover:[box-shadow:0_0_12px_0px_rgba(2,255,11,0.27)]' +
+        ' active:from-accent-base active:text-white/80 active:opacity-80 active:shadow-none' +
+        ' focus:from-accent-lighter focus:text-white/80' +
+        ' disabled:bg-none disabled:bg-gray disabled:border-light-gray disabled:text-white/50 disabled:[box-shadow:0_0_12px_0px_rgba(70,70,70,1.0)] disabled:active:opacity-100' +
+        ' leading-none',
+
     variants: {
-        variant: {
-            primary: 'bg-brand text-white hover:bg-brand-dark active:bg-brand-dark',
-            secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300',
-            outline: 'border border-gray-300 bg-transparent hover:bg-gray-50 active:bg-gray-100',
-            ghost: 'bg-transparent hover:bg-gray-100 active:bg-gray-200',
-            danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
+        type: {
+            accent: '',
+            danger:
+                '[box-shadow:0_0_12px_1px_rgba(218,43,43,0.4)] hover:[box-shadow:0_0_12px_1px_rgba(218,43,43,0.4)]' +
+                ' from-error to-error-dark border-error-light' +
+                ' hover:from-error-light hover:to-error' +
+                ' active:from-error active:to-error-dark active:opacity-80' +
+                ' focus:from-error focus:to-error-dark focus:opacity-80',
+            solid:
+                '[box-shadow:0_0_12px_1px_rgba(50,50,50,0.7)] hover:[box-shadow:0_0_12px_1px_rgba(50,50,50,0.7)]' +
+                ' bg-none bg-input-outline border-light-gray' +
+                ' hover:bg-light-gray hover:border-input-placeholder' +
+                ' active:bg-input-outline active:border-light-gray' +
+                ' focus:bg-input-outline focus:border-light-gray focus:text-white/80',
         },
-        size: {
-            sm: 'h-8 px-3 text-sm gap-1.5',
-            md: 'h-10 px-4 text-base gap-2',
-            lg: 'h-12 px-6 text-lg gap-2.5',
-        },
-        fullWidth: {
-            true: 'w-full',
-        },
-    },
-    defaultVariants: {
-        variant: 'primary',
-        size: 'md',
     },
 });
-
-export type ButtonVariants = VariantProps<typeof buttonVariants>;

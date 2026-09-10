@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { buttonVariants, type ButtonVariants } from '@/shared';
+import { buttonVariants } from '@/shared';
 
 interface Props {
-    variant?: ButtonVariants['variant'];
-    size?: ButtonVariants['size'];
-    fullWidth?: boolean;
+    variantButton?: 'accent' | 'danger' | 'solid';
     type?: 'button' | 'submit' | 'reset';
+    accessibilityLabel?: string;
     disabled?: boolean;
 }
 
@@ -21,7 +20,7 @@ withDefaults(defineProps<Props>(), {
   <button
     :type="type"
     :disabled="disabled"
-    :class="buttonVariants({ variant, size, fullWidth })"
+    :class="buttonVariants({ type: variantButton })"
   >
     <slot />
   </button>
