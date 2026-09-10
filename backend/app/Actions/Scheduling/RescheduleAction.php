@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
- * Rebalances the schedule after a task is linked or its dates change.
+ * Перебалансирует раскид после привязки задачи или изменения ее дат.
  *
- * Chained tasks (those with a next_task_id or a predecessor) are pushed forward
- * so each successor starts at its predecessor's deadline using the smallest
- * possible displacement. Unattached tasks are never moved and may overlap. If a
- * chained deadline crosses into the following sprint, only the leading chained
- * tasks of that sprint are shifted by the minimal amount to restore a zero gap.
- * The cascade only runs forward from the changed task's sprint.
+ *  Связанные задачи (те, у которых есть next_task_id или предшественник) передвигаются вперед.
+ *  таким образом, каждый преемник начинает работу в срок своего предшественника, используя наименьший срок
+ *  сдвига (как башенка). Неприкрепленные задачи никогда не перемещаются и могут перекрываться. Если
+ *  дедлайн переходит в следующий спринт, то следуюущие
+ *  задачи этого спринта сдвигаются на минимальную величину, чтобы восстановить нулевой разрыв.
  */
 class RescheduleAction
 {
