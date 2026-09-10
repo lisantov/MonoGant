@@ -2,20 +2,20 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
+use App\Enums\StatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use PHPUnit\Logging\OpenTestReporting\Status;
 
 #[Fillable(
     [
         'name',
         'started_at',
         'deadline_at',
-        'status_id',
-        'user_id',
+        'status',
     ])
 ]
 class Project extends Model
@@ -27,16 +27,26 @@ class Project extends Model
         return [
             'started_at' => 'datetime',
             'deadline_at' => 'datetime',
+            'status' => StatusEnum::class,
         ];
     }
 
-    public function user(): BelongsTo
+    public function owner(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class, 'project_user')
+            ->wherePivot('role', RoleEnum::Owner->value)
+            ->using(ProjectUser::class);
     }
 
-    public function status(): BelongsTo
+    public function sprints(): HasMany
     {
-        return $this->belongsTo(Status::class);
+        return $this->hasMany(Sprint::class);
+    }
+
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'project_user')
+            ->withPivot('role')
+            ->using(ProjectUser::class);
     }
 }
