@@ -67,7 +67,7 @@ const {
 
 <template>
   <div
-    class="absolute flex bg-blue-500 text-sm text-white rounded-md ring-0 ring-transparent transition duration-150"
+    class="gantt-bar absolute flex bg-blue-500 text-sm text-white rounded-md ring-0 ring-transparent transition duration-150"
     :class="{
       'opacity-40': isDragging || isResizing,
       'cursor-grab': !isDragging,
@@ -85,12 +85,12 @@ const {
   >
     <div class="w-full flex items-center px-2 relative">
       <div
-        class="absolute h-full w-2 bg-transparent left-0 cursor-col-resize"
+        class="gantt-bar-resizer absolute h-full w-2 bg-transparent left-0 cursor-col-resize"
         @mousedown.stop="startLeft"
       />
-      {{ bar.name }}
+      {{ currentBar.name }}
       <div
-        class="absolute h-full w-2 bg-transparent right-0 cursor-col-resize"
+        class="gantt-bar-resizer absolute h-full w-2 bg-transparent right-0 cursor-col-resize"
         @mousedown.stop="startRight"
       />
     </div>

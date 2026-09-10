@@ -11,6 +11,7 @@ import {
     type IGanttConfig,
     type IGanttTask,
     type IMonth,
+    usePanScroll,
 } from '../lib';
 
 interface IProps {
@@ -74,12 +75,21 @@ const months = computed<IMonth[]>(() => {
 
     return result;
 });
+
+const { isPanning, onMouseDown: onPanStart } = usePanScroll(scrollContainer, {
+    shouldIgnore: (target) =>
+        !!target.closest('.gantt-bar') ||
+        !!target.closest('.gantt-bar-resizer') ||
+        !!target.closest('button, a, input, select, textarea'),
+});
 </script>
 
 <template>
   <section
     ref="scrollContainer"
-    class="rounded-xl overflow-hidden border border-gray-400 bg-white flex flex-col overflow-x-auto"
+    class="rounded-xl border border-gray-400 bg-white flex flex-col overflow-auto"
+    :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
+    @mousedown="onPanStart"
   >
     <GanttHeader :months="months" />
     <GanttBody
