@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { registerSchema } from '@/features';
-import { AppButton, AppInput } from '@/shared';
+import { AppButton, AppInput, AppLink } from '@/shared';
 
 const { defineField, errors } = useForm({
     validationSchema: registerSchema,
 });
+
+// const { mutateAsync, isLoading } = useRegister()
 
 const [name, nameAttrs] = defineField('name');
 const [email, emailAttrs] = defineField('email');
@@ -18,11 +20,11 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 </script>
 
 <template>
-  <form class="flex flex-col justify-center gap-6">
+  <form class="flex w-full h-full flex-col justify-between items-center py-[120px] px-[90px]">
     <h2 class="text-[60px] text-white font-jost font-semibold text-center">
       Создание аккаунта
     </h2>
-    <div class="flex flex-col items-center justify-center gap-5">
+    <div class="flex w-full flex-col justify-center gap-5">
       <app-input
         v-model="name"
         placeholder="Имя"
@@ -37,17 +39,27 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
       />
       <app-input
         v-model="password"
+        type="password"
         placeholder="Пароль"
         :error="errors.password"
         v-bind="passwordAttrs"
       />
       <app-input
         v-model="confirmPassword"
+        type="password"
         placeholder="Повторите пароль"
         :error="errors.confirmPassword"
         v-bind="confirmPasswordAttrs"
       />
     </div>
-    <app-button> Регистрация </app-button>
+    <div class="flex flex-col w-full justify-center gap-[15px]">
+      <app-button> Создать аккаунт </app-button>
+      <p class="text-white font-montserrat font-normal text-[18px] text-center">
+        У вас есть аккаунт?
+        <AppLink to="login">
+          Войти
+        </AppLink>
+      </p>
+    </div>
   </form>
 </template>
