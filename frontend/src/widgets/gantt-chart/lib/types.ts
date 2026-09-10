@@ -29,10 +29,10 @@ export const GANTT_TASK_TEXT = new Map([
 ]);
 
 export const GANTT_TASK_STYLE = new Map([
-    [GANTT_TASK_STATUS.PLANNED, 'bg-blue-400 border-blue-500 text-white'],
-    [GANTT_TASK_STATUS.IN_PROGRESS, 'bg-yellow-500 border-yellow-600 text-white'],
-    [GANTT_TASK_STATUS.DONE, 'bg-green-400 border-green-500 text-white'],
-    [GANTT_TASK_STATUS.CANCELLED, 'bg-gray-500 border-gray-600 text-white opacity-40'],
+    [GANTT_TASK_STATUS.PLANNED, 'bg-blue/20 border-blue text-white'],
+    [GANTT_TASK_STATUS.IN_PROGRESS, 'bg-purple/20 border-purple text-white'],
+    [GANTT_TASK_STATUS.DONE, 'bg-accent-dark/20 border-widget-accent text-white'],
+    [GANTT_TASK_STATUS.CANCELLED, 'bg-pink/20 border-pink text-white opacity-40'],
 ]);
 
 export interface IGanttTask {

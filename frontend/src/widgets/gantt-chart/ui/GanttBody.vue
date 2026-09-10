@@ -28,7 +28,7 @@ const sprintsSource = inject(SPRINTS_KEY)!;
 const hoveredBarId = ref<number | null>(null);
 provide(GANTT_UI_KEY, { hoveredBarId });
 
-const HEADER_HEIGHT = 24;
+const HEADER_HEIGHT = 66;
 
 const dayStart = (d: Date) => {
     const x = new Date(d);
@@ -312,12 +312,12 @@ const linkPreviewPath = computed(() => {
       <div
         v-for="month in months"
         :key="`${month.year}-${month.monthIndex}`"
-        class="flex not-last:border-r border-gray-400"
+        class="flex not-last:border-r border-white/32 bg-gray"
       >
         <div
           v-for="day in month.days"
           :key="`${month.year}-${month.monthIndex}-${day}`"
-          class="flex justify-center items-center not-last:border-r border-gray-100 relative"
+          class="flex justify-center items-center not-last:border-r border-white/6 relative"
           :style="{ width: timescale.dayWidth.value + 'px' }"
         >
           <div
@@ -336,7 +336,7 @@ const linkPreviewPath = computed(() => {
       <div
         v-for="sprint in sprintLayouts"
         :key="`sprint-${sprint.id}`"
-        class="absolute top-0 bottom-0 rounded-lg border-2 border-dashed pointer-events-none"
+        class="absolute top-0 bottom-0 rounded-lg border-2 border-dashed pointer-events-none p-3.75"
         :style="{
           left: sprint.x + 'px',
           width: sprint.days * timescale.dayWidth.value + 'px',
@@ -345,12 +345,9 @@ const linkPreviewPath = computed(() => {
         }"
       >
         <div
-          class="flex items-center px-2 font-semibold"
-          :style="{
-            height: sprint.headerHeight + 'px',
-            color: sprint.color.text,
-          }"
+          class="w-min flex items-center justify-center whitespace-nowrap gap-2 px-3 py-2 font-jost font-regular text-md text-input-placeholder bg-input-placeholder-hover/10 border border-input-placeholder-hover/20 rounded-[10px]"
         >
+          <div class="rounded-full bg-input-placeholder w-2 aspect-square" />
           {{ sprint.name }}
         </div>
       </div>

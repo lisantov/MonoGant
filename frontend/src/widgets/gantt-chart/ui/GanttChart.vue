@@ -90,7 +90,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="rounded-xl border border-gray-400 bg-white flex overflow-hidden"
+    class="rounded-xl border min-h-screen flex overflow-hidden"
     style="height: 600px"
   >
     <GanttSidebar />
