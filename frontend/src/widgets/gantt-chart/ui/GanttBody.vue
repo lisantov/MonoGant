@@ -7,7 +7,6 @@ import {
     GANTT_UI_KEY,
     MS_PER_DAY,
     TIMESCALE_KEY,
-    topoSort,
     type IGanttBar,
     type IGanttTask,
     type IMonth,
@@ -28,9 +27,16 @@ const bars = computed<IGanttBar[]>(() => {
     const result: IGanttBar[] = [];
     const map = new Map<number, IGanttBar>();
 
-    const sorted = topoSort([...props.tasks]);
+    // карта предшественников: id → задача, у которой next_task_id === id
+    const predecessorOf = new Map<number, IGanttTask>();
+    for (const t of props.tasks) {
+        if (t.next_task_id != null) predecessorOf.set(t.next_task_id, t);
+    }
 
-    for (const [index, task] of sorted.entries()) {
+    // id, на которые кто-то указывает → эти задачи «привязаны» справа
+    const lockedIds = new Set(predecessorOf.keys());
+
+    for (const [index, task] of props.tasks.entries()) {
         const start = new Date(task.started_at);
         const end = new Date(task.deadline_at);
         start.setHours(0, 0, 0, 0);
@@ -39,11 +45,12 @@ const bars = computed<IGanttBar[]>(() => {
 
         let x = timescale.dateToX(start);
 
-        // зависимая задача всегда прижата к правому краю родителя
-        if (task.depends_on != null) {
-            const parent = map.get(task.depends_on);
-            if (parent) {
-                x = parent.x + parent.days * timescale.dayWidth.value;
+        // если есть предшественник — прижимаемся к его правому краю
+        const pred = predecessorOf.get(task.id);
+        if (pred) {
+            const parentBar = map.get(pred.id);
+            if (parentBar) {
+                x = parentBar.x + parentBar.days * timescale.dayWidth.value;
             }
         }
 
@@ -55,8 +62,8 @@ const bars = computed<IGanttBar[]>(() => {
             y: index * timescale.dayHeight.value,
             days,
             status: task.status,
-            depends_on: task.depends_on,
-            isLocked: task.depends_on != null,
+            next_task_id: task.next_task_id,
+            isLocked: lockedIds.has(task.id),
         };
         result.push(bar);
         map.set(bar.id, bar);
@@ -72,14 +79,24 @@ const barById = computed(() => {
     return map;
 });
 
-// все стрелки
+const taskById = computed(() => {
+    const map = new Map<number, IGanttTask>();
+    for (const t of props.tasks) map.set(t.id, t);
+    return map;
+});
+
 const links = computed(() =>
     props.tasks
-        .filter((t) => t.depends_on != null)
-        .filter((t) => t.status !== GANTT_TASK_STATUS.CANCELLED)
+        .filter((t) => t.next_task_id != null)
+        .filter((t) => {
+            if (t.status === GANTT_TASK_STATUS.CANCELLED) return false;
+            const next = taskById.value.get(t.next_task_id!);
+            if (next?.status === GANTT_TASK_STATUS.CANCELLED) return false;
+            return true;
+        })
         .map((t) => {
-            const from = barById.value.get(t.depends_on!);
-            const to = barById.value.get(t.id);
+            const from = barById.value.get(t.id);
+            const to = barById.value.get(t.next_task_id!);
             if (!from || !to) return null;
             return {
                 id: `${from.id}->${to.id}`,

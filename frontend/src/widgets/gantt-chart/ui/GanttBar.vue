@@ -66,12 +66,12 @@ const {
 });
 
 const onBarMouseDown = (e: MouseEvent) => {
-    if (props.bar.isLocked) return;
+    if (currentBar.value.isLocked) return;
     startDrag(e);
 };
 
 const onResizeMouseDown = (e: MouseEvent) => {
-    if (props.bar.isLocked) return;
+    if (currentBar.value.isLocked) return;
     startLeft(e);
 };
 </script>

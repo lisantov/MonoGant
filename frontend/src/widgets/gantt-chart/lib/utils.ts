@@ -51,21 +51,41 @@ export const buildDependencyPath = (
     ].join(' ');
 };
 
-export const topoSort = (tasks: IGanttTask[]) => {
+export function sortByChains(tasks: IGanttTask[]): IGanttTask[] {
     const byId = new Map(tasks.map((t) => [t.id, t]));
+
+    // id всех, на кого кто-то указывает = «зависимые» (есть входящее ребро)
+    const hasIncoming = new Set<number>();
+    for (const t of tasks) {
+        if (t.next_task_id != null) hasIncoming.add(t.next_task_id);
+    }
+
+    // начала цепочек — те, на кого никто не указывает
+    const starts = tasks.filter((t) => !hasIncoming.has(t.id));
+
     const visited = new Set<number>();
-    const out: IGanttTask[] = [];
+    const chains: IGanttTask[][] = [];
+    const standalone: IGanttTask[] = [];
 
-    const visit = (t: IGanttTask) => {
-        if (visited.has(t.id)) return;
-        visited.add(t.id);
-        if (t.depends_on != null) {
-            const parent = byId.get(t.depends_on);
-            if (parent) visit(parent);
+    for (const start of starts) {
+        const chain: IGanttTask[] = [];
+        let cur: IGanttTask | undefined = start;
+
+        while (cur && !visited.has(cur.id)) {
+            visited.add(cur.id);
+            chain.push(cur);
+            cur = cur.next_task_id != null ? byId.get(cur.next_task_id) : undefined;
         }
-        out.push(t);
-    };
 
-    for (const t of tasks) visit(t);
-    return out;
-};
+        if (chain.length > 1) chains.push(chain);
+        else if (chain[0]) standalone.push(chain[0]);
+    }
+
+    // страховка от циклов (если пользователь как-то создал A → B → A)
+    const orphans: IGanttTask[] = [];
+    for (const t of tasks) {
+        if (!visited.has(t.id)) orphans.push(t);
+    }
+
+    return [...chains.flat(), ...standalone, ...orphans];
+}

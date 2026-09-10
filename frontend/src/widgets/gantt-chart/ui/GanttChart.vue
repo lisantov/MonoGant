@@ -22,17 +22,21 @@ const props = defineProps<IProps>();
 const scrollContainer = ref<HTMLElement | null>(null);
 
 onMounted(() => {
-    if (scrollContainer.value) {
-        const firstTask = tasksSource.tasks.value[0];
-        if (!firstTask) scrollContainer.value.scrollTo({ left: 0 });
+    const el = scrollContainer.value;
+    if (!el) return;
 
-        const x = timescale.dateToX(new Date(firstTask!.started_at));
-        scrollContainer.value.scrollTo({ left: Math.max(0, x - 24) });
+    const firstTask = tasksSource.sortedTasks.value[0];
+    if (!firstTask) {
+        el.scrollTo({ left: 0 });
+        return;
     }
+
+    const x = timescale.dateToX(new Date(firstTask.started_at));
+    el.scrollTo({ left: Math.max(0, x - 24) });
 });
 
 const tasksSource = useGanttTasks(toRef(props, 'tasks'));
-const timescale = useTimeScale(props.config, tasksSource.tasks);
+const timescale = useTimeScale(props.config, tasksSource.sortedTasks);
 
 provide(TASKS_KEY, tasksSource);
 provide(TIMESCALE_KEY, timescale);
@@ -94,7 +98,7 @@ const { isPanning, onMouseDown: onPanStart } = usePanScroll(scrollContainer, {
     <GanttHeader :months="months" />
     <GanttBody
       :months="months"
-      :tasks="tasksSource.tasks.value"
+      :tasks="tasksSource.sortedTasks.value"
     />
   </section>
 </template>

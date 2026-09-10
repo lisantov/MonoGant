@@ -8,6 +8,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
         status: GANTT_TASK_STATUS.DONE,
+        next_task_id: 2,
     },
     {
         id: 2,
@@ -15,7 +16,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
-        depends_on: 1,
+        next_task_id: 3,
         status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
@@ -25,6 +26,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
         status: GANTT_TASK_STATUS.PLANNED,
+        next_task_id: null,
     },
     {
         id: 4,
@@ -32,6 +34,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
+        next_task_id: null,
         status: GANTT_TASK_STATUS.CANCELLED,
     },
     {
@@ -40,7 +43,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
-        depends_on: 4,
+        next_task_id: null,
         status: GANTT_TASK_STATUS.CANCELLED,
     },
     {
@@ -49,6 +52,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
+        next_task_id: 7,
         status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
@@ -57,6 +61,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
+        next_task_id: null,
         status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
@@ -65,7 +70,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
-        depends_on: 7,
+        next_task_id: 9,
         status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
@@ -74,6 +79,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
+        next_task_id: 10,
         status: GANTT_TASK_STATUS.DONE,
     },
     {
@@ -82,7 +88,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
-        depends_on: 9,
+        next_task_id: null,
         status: GANTT_TASK_STATUS.DONE,
     },
     {
@@ -91,6 +97,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
+        next_task_id: 12,
         status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
@@ -99,7 +106,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-10',
         deadline_at: '2026-09-15',
-        depends_on: 11,
+        next_task_id: 13,
         status: GANTT_TASK_STATUS.IN_PROGRESS,
     },
     {
@@ -108,7 +115,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-16',
         deadline_at: '2026-09-20',
-        depends_on: 11,
+        next_task_id: null,
         status: GANTT_TASK_STATUS.CANCELLED,
     },
     {
@@ -117,7 +124,7 @@ export const DEFAULT_TASKS: IGanttTask[] = [
         description: 'Оу ес',
         started_at: '2026-09-21',
         deadline_at: '2026-09-23',
-        depends_on: 11,
+        next_task_id: null,
         status: GANTT_TASK_STATUS.CANCELLED,
     },
 ];

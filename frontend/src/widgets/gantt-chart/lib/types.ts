@@ -40,7 +40,17 @@ export interface IGanttTask {
     started_at: string;
     deadline_at: string;
     status: GANTT_TASK_STATUS;
-    depends_on?: number | null;
+    next_task_id?: number | null;
+}
+
+export interface IGanttSprint {
+    id: number;
+    name: string;
+    description: string;
+    started_at: string;
+    deadline_at: string;
+    status: GANTT_TASK_STATUS;
+    tasks: IGanttTask[];
 }
 
 export interface IGanttBar {
@@ -51,7 +61,7 @@ export interface IGanttBar {
     y: number;
     days: number;
     status: GANTT_TASK_STATUS;
-    depends_on?: number | null;
+    next_task_id?: number | null;
     isLocked?: boolean;
 }
 
