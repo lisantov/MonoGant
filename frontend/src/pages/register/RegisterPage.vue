@@ -3,9 +3,8 @@ import { FormRegister } from '@/features';
 </script>
 
 <template>
-  <div
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-linear-to-br from-gray-50 to-gray-100"
-  >
+  <div class="flex h-screen grid-cols-2 gap-3 border-">
     <form-register />
+    <p>safcoamdfo</p>
   </div>
 </template>

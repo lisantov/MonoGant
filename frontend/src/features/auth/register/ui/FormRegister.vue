@@ -20,9 +20,9 @@ import { AppButton, AppInput } from '@/shared';
 </script>
 
 <template>
-  <form class="flex flex-col items-center justify-center gap-15">
-    <h2 class="text-[32px] text-center">
-      Регистрация
+  <form class="flex flex-col justify-center">
+    <h2 class="text-[60px] text-white font-jost font-semibold text-center">
+      Создание аккаунта
     </h2>
     <div class="flex flex-col items-center justify-center gap-5">
       <app-input
