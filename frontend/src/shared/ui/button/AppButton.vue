@@ -4,7 +4,6 @@ import { buttonVariants } from '@/shared';
 interface Props {
     variantButton?: 'accent' | 'danger' | 'solid';
     type?: 'button' | 'submit' | 'reset';
-    accessibilityLabel?: string;
     disabled?: boolean;
 }
 
