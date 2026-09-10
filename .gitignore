@@ -1,0 +1,12 @@
+.idea/
+.zed/
+.codex/
+.air/
+.vscode/
+.codex
+.zed
+.claude
+*.env
+*.Identifier
+collection/
+.DS_Store

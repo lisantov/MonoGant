@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.env
+.env.local
+.DS_Store
+*.log
+.idea
+.vscode
+backend/public/storage
+backend/storage
+backend/vendor
+backend/node_modules
+.gitignore
+README.md
