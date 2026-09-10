@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Sprint;
+namespace App\Http\Requests\Project;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RemoveSprintDependencyRequest extends FormRequest
+class StoreProjectMembersRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -20,8 +20,8 @@ class RemoveSprintDependencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'predecessor_id' => ['required_without:successor_id', 'integer', 'prohibits:successor_id', 'exists:sprints,id'],
-            'successor_id' => ['required_without:predecessor_id', 'integer', 'prohibits:predecessor_id', 'exists:sprints,id'],
+            'emails' => ['required', 'array', 'min:1'],
+            'emails.*' => ['required', 'email', 'exists:users,email', 'distinct:strict'],
         ];
     }
 }

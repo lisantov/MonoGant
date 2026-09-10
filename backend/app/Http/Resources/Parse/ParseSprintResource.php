@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Parse;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SprintResource extends JsonResource
+class ParseSprintResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,7 +14,8 @@ class SprintResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        return
+        [
             'id' => $this->id,
             'name' => $this->name,
             'started_at' => $this->started_at(),
@@ -22,6 +23,7 @@ class SprintResource extends JsonResource
             'status' => $this->status,
             'description' => $this->description,
             'next_sprint_id' => $this->next_sprint_id,
+            'tasks' => ParseTaskResource::collection($this->tasks),
         ];
     }
 }

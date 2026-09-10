@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
@@ -18,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'sprint_id',
     'status',
     'user_id',
+    'next_task_id',
 ])]
 class Task extends Model
 {
@@ -26,22 +26,20 @@ class Task extends Model
     protected function casts(): array
     {
         return [
-            'started_at' => 'datetime',
-            'deadline_at' => 'datetime',
+            'started_at' => 'date',
+            'deadline_at' => 'date',
             'status' => StatusEnum::class,
         ];
     }
 
-    public function predecessors(): BelongsToMany
+    public function next_task(): BelongsTo
     {
-        return $this->belongsToMany(Task::class, 'task_dependencies', 'successor_task_id', 'predecessor_task_id')
-            ->withTimestamps();
+        return $this->belongsTo(Task::class, 'next_task_id');
     }
 
-    public function successors(): BelongsToMany
+    public function previous_task(): HasOne
     {
-        return $this->belongsToMany(Task::class, 'task_dependencies', 'predecessor_task_id', 'successor_task_id')
-            ->withTimestamps();
+        return $this->hasOne(Task::class, 'next_task_id');
     }
 
     public function sprint(): BelongsTo

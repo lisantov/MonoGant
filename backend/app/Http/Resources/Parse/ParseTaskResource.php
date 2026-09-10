@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Parse;
 
+use App\Http\Resources\CommentResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TaskResource extends JsonResource
+class ParseTaskResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -25,6 +27,7 @@ class TaskResource extends JsonResource
             'sprint_id' => $this->sprint_id,
             'next_task_id' => $this->next_task_id,
             'user' => new UserResource(User::find($this->user_id)),
+            'comments' => CommentResource::collection($this->comments),
         ];
     }
 }

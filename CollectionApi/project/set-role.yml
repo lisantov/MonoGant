@@ -1,16 +1,16 @@
 info:
-  name: unlink-dependency
+  name: set-role
   type: http
   seq: 7
 
 http:
-  method: DELETE
-  url: "{{host}}{{prefix}}/tasks/1/dependencies"
+  method: PATCH
+  url: "{{host}}{{prefix}}/projects/1/members/2"
   body:
     type: json
     data: |-
       {
-        "successor_id": 2
+        "role": "responsible"
       }
   auth: inherit
 

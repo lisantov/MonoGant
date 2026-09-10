@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Task;
+namespace App\Http\Requests\Project;
 
+use App\Enums\RoleEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class RemoveTaskDependencyRequest extends FormRequest
+class SetProjectMemberRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -20,8 +22,7 @@ class RemoveTaskDependencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'predecessor_id' => ['required_without:successor_id', 'integer', 'prohibits:successor_id', 'exists:tasks,id'],
-            'successor_id' => ['required_without:predecessor_id', 'integer', 'prohibits:predecessor_id', 'exists:tasks,id'],
+            'role' => ['required', Rule::in([RoleEnum::Member->value, RoleEnum::Responsible->value])],
         ];
     }
 }

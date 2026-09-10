@@ -17,11 +17,13 @@ class ProjectResource extends JsonResource
         $owner = $this->owner()->first();
 
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'started_at' => $this->started_at,
             'deadline_at' => $this->deadline_at,
             'status' => $this->status,
             'owner' => $owner ? new UserResource($owner) : null,
+            'members' => UserResource::collection($this->members),
         ];
     }
 }

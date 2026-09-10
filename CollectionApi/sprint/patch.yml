@@ -10,7 +10,8 @@ http:
     type: json
     data: |-
       {
-        "name": "sprint2"
+        "name": "sprint2",
+        "description": "description"
       }
   auth: inherit
 

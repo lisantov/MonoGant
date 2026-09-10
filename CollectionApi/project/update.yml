@@ -10,7 +10,9 @@ http:
     type: json
     data: |-
       {
-        "name": "arche"
+        "name": "arche",
+        "deadline_at": "2026-09-15",
+        "status": "in_progress"
       }
   auth: inherit
 

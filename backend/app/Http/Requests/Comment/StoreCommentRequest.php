@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Task;
+namespace App\Http\Requests\Comment;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreTaskDependencyRequest extends FormRequest
+class StoreCommentRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -20,8 +20,7 @@ class StoreTaskDependencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'predecessor_id' => ['required_without:successor_id', 'integer', 'prohibits:successor_id', 'exists:tasks,id'],
-            'successor_id' => ['required_without:predecessor_id', 'integer', 'prohibits:predecessor_id', 'exists:tasks,id'],
+            'body' => ['required', 'string'],
         ];
     }
 }

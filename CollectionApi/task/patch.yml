@@ -10,7 +10,8 @@ http:
     type: json
     data: |-
       {
-        "name": "task2"
+        "name": "task2",
+        "next_task_id": 2
       }
   auth: inherit
 

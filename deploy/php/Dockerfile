@@ -39,7 +39,6 @@ COPY ./backend/.env /var/www/.env
 
 COPY ./backend/composer.json ./backend/composer.lock* /var/www/
 RUN composer install --optimize-autoloader --no-interaction --no-progress --no-scripts
-
 COPY ./deploy/php/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

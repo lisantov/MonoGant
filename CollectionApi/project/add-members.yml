@@ -1,16 +1,19 @@
 info:
-  name: link-dependency
+  name: add-members
   type: http
   seq: 6
 
 http:
   method: POST
-  url: "{{host}}{{prefix}}/tasks/1/dependencies"
+  url: "{{host}}{{prefix}}/projects/1/members"
   body:
     type: json
     data: |-
       {
-        "predecessor_id": 2
+        "emails": [
+          "email2@email.com",
+          "email23@email.com"    
+        ]
       }
   auth: inherit
 

@@ -1,16 +1,16 @@
 info:
-  name: unlink-dependency
+  name: create
   type: http
-  seq: 7
+  seq: 2
 
 http:
-  method: DELETE
-  url: "{{host}}{{prefix}}/sprints/1/dependencies"
+  method: POST
+  url: "{{host}}{{prefix}}/tasks/1/comments"
   body:
     type: json
     data: |-
       {
-        "successor_id": 2
+        "body": "comment body"
       }
   auth: inherit
 

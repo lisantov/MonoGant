@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Sprint\AddSprintDependencyAction;
 use App\Actions\Sprint\CreateSprintAction;
-use App\Actions\Sprint\RemoveSprintDependencyAction;
 use App\Actions\Sprint\UpdateSprintAction;
-use App\Http\Requests\Sprint\RemoveSprintDependencyRequest;
-use App\Http\Requests\Sprint\StoreSprintDependencyRequest;
 use App\Http\Requests\Sprint\StoreSprintRequest;
 use App\Http\Requests\Sprint\UpdateSprintRequest;
 use App\Http\Resources\SprintResource;
@@ -20,6 +16,10 @@ class SprintController extends Controller
 {
     public function index(Project $project)
     {
+        if (! Gate::inspect('project-show', $project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return SprintResource::collection($project->sprints);
     }
 
@@ -37,6 +37,10 @@ class SprintController extends Controller
 
     public function show(Sprint $sprint)
     {
+        if (! Gate::inspect('project-show', $sprint->project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
         return new SprintResource($sprint);
     }
 
@@ -63,31 +67,9 @@ class SprintController extends Controller
         ]);
     }
 
-    public function linkDependency(StoreSprintDependencyRequest $request, Sprint $sprint)
-    {
-        $this->authorizeProject($sprint->project);
-
-        AddSprintDependencyAction::run($sprint, $request->validated());
-
-        return response()->json([
-            'message' => 'Dependency linked successfully',
-        ]);
-    }
-
-    public function unlinkDependency(RemoveSprintDependencyRequest $request, Sprint $sprint)
-    {
-        $this->authorizeProject($sprint->project);
-
-        RemoveSprintDependencyAction::run($sprint, $request->validated());
-
-        return response()->json([
-            'message' => 'Dependency unlinked successfully',
-        ]);
-    }
-
     private function authorizeProject(Project $project): void
     {
-        if (! Gate::inspect('update', $project)->allowed()) {
+        if (! Gate::inspect('project-edit', $project)->allowed()) {
             throw new AccessDeniedHttpException;
         }
     }

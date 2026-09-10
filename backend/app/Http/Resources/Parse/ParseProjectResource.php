@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Parse;
 
-use App\Models\User;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TaskResource extends JsonResource
+class ParseProjectResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,16 +15,17 @@ class TaskResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $owner = $this->owner()->first();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'description' => $this->description,
             'started_at' => $this->started_at,
             'deadline_at' => $this->deadline_at,
             'status' => $this->status,
-            'sprint_id' => $this->sprint_id,
-            'next_task_id' => $this->next_task_id,
-            'user' => new UserResource(User::find($this->user_id)),
+            'owner' => $owner ? new UserResource($owner) : null,
+            'members' => UserResource::collection($this->members),
+            'sprints' => ParseSprintResource::collection($this->sprints),
         ];
     }
 }
