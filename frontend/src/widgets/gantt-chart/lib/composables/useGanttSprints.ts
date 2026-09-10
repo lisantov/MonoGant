@@ -139,6 +139,72 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
         });
     };
 
+    const linkTasks = (fromId: number, toId: number): { ok: boolean; error?: string } => {
+        if (fromId === toId) return { ok: false, error: 'Нельзя связать задачу саму с собой' };
+
+        // карта id → sprintId
+        const sprintOf = new Map<number, number>();
+        const byId = new Map<number, IGanttTask>();
+        for (const s of sprints.value) {
+            for (const t of s.tasks) {
+                sprintOf.set(t.id, s.id);
+                byId.set(t.id, t);
+            }
+        }
+
+        const from = byId.get(fromId);
+        const to = byId.get(toId);
+        if (!from || !to) return { ok: false, error: 'Задача не найдена' };
+
+        // связи только внутри спринта — иначе reflow не сработает
+        if (sprintOf.get(fromId) !== sprintOf.get(toId)) {
+            return { ok: false, error: 'Задачи должны быть в одном спринте' };
+        }
+
+        // защита от цикла: идём по next_task_id от `to`; если дойдём до `from` — цикл
+        let cur: IGanttTask | undefined = to;
+        const seen = new Set<number>();
+        while (cur && cur.next_task_id != null) {
+            if (seen.has(cur.id)) break;
+            seen.add(cur.id);
+            if (cur.next_task_id === fromId) return { ok: false, error: 'Образуется цикл' };
+            cur = byId.get(cur.next_task_id);
+        }
+
+        const sprintId = sprintOf.get(fromId)!;
+
+        sprints.value = sprints.value.map((s) => {
+            if (s.id !== sprintId) return s;
+
+            let updated = s.tasks.map((t) => {
+                // 1) source: ставим новый next_task_id
+                if (t.id === fromId) return { ...t, next_task_id: toId };
+
+                // 2) у `to` может уже быть предшественник — рвём его связь
+                if (t.next_task_id === toId && t.id !== fromId) {
+                    return { ...t, next_task_id: null };
+                }
+
+                // 3) если source раньше указывал на кого-то — это ок, мы уже перезаписали
+                return t;
+            });
+
+            // 4) каскадно пересчитываем цепочку после source
+            updated = reflowChain(updated, fromId);
+
+            return { ...s, tasks: updated };
+        });
+
+        return { ok: true };
+    };
+
+    const unlinkTask = (fromId: number) => {
+        sprints.value = sprints.value.map((s) => ({
+            ...s,
+            tasks: s.tasks.map((t) => (t.id === fromId ? { ...t, next_task_id: null } : t)),
+        }));
+    };
+
     /** Правый ресайз спринта: сдвигаем дедлайн самой длинной задачи */
     const resizeSprintRight = (sprintId: number, newTotalDays: number) => {
         sprints.value = sprints.value.map((s) => {
@@ -214,6 +280,8 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
         refreshSprintDates,
         resizeSprintRight,
         applyTaskLayout,
+        linkTasks,
+        unlinkTask,
     };
 };
 

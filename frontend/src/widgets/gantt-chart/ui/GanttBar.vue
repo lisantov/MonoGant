@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref, watch } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import {
     useGanttBarResize,
     useGanttBarDrag,
@@ -8,6 +8,7 @@ import {
     GANTT_UI_KEY,
     type IGanttBar,
     GANTT_TASK_STYLE,
+    GANTT_LINK_KEY,
 } from '../lib';
 
 interface IProps {
@@ -66,6 +67,7 @@ const {
 });
 
 const onBarMouseDown = (e: MouseEvent) => {
+    if (linkState.linkingFrom.value != null) return; // идёт создание связи
     if (currentBar.value.isLocked) return;
     startDrag(e);
 };
@@ -73,6 +75,13 @@ const onBarMouseDown = (e: MouseEvent) => {
 const onResizeMouseDown = (e: MouseEvent) => {
     if (currentBar.value.isLocked) return;
     startLeft(e);
+};
+
+const linkState = inject(GANTT_LINK_KEY)!;
+const isLinkTarget = computed(() => linkState.hoveredTargetId.value === currentBar.value.id);
+
+const onLinkHandleDown = (e: MouseEvent) => {
+    linkState.startLink(currentBar.value.id, e);
 };
 </script>
 
@@ -84,6 +93,7 @@ const onResizeMouseDown = (e: MouseEvent) => {
       'cursor-grab': !isDragging && !bar.isLocked,
       'cursor-grabbing': isDragging && !bar.isLocked,
       [GANTT_TASK_STYLE.get(bar.status)!]: true,
+      'ring-2 ring-blue-500 ring-offset-1': isLinkTarget,
     }"
     :style="{
       left: currentBar.x + 'px',
@@ -95,6 +105,10 @@ const onResizeMouseDown = (e: MouseEvent) => {
     @mouseenter="hoveredBarId = currentBar.id"
     @mouseleave="hoveredBarId = null"
   >
+    <div
+      class="gantt-link-handle absolute -right-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 border-blue-500 cursor-crosshair opacity-0 group-hover:opacity-100 transition-opacity z-20"
+      @mousedown.stop="onLinkHandleDown"
+    />
     <div class="w-full flex items-center px-2 relative">
       <div
         class="gantt-bar-resizer absolute h-full w-2 bg-transparent left-0"

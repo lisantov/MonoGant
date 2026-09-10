@@ -70,6 +70,7 @@ const { isPanning, onMouseDown: onPanStart } = usePanScroll(scrollContainer, {
     shouldIgnore: (target) =>
         !!target.closest('.gantt-bar') ||
         !!target.closest('.gantt-bar-resizer') ||
+        !!target.closest('.gantt-link-handle') ||
         !!target.closest('button, a, input, select, textarea'),
 });
 

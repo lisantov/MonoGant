@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, inject, provide, ref } from 'vue';
+import { computed, inject, provide, ref, onBeforeUnmount, reactive } from 'vue';
 import { GanttBar } from '.';
 import {
     buildDependencyPath,
@@ -8,6 +8,7 @@ import {
     MS_PER_DAY,
     SPRINTS_KEY,
     TIMESCALE_KEY,
+    GANTT_LINK_KEY,
     sortByChains,
     type IGanttBar,
     type IGanttSprintBar,
@@ -200,6 +201,108 @@ const isItToday = (month: IMonth, day: number) => {
         t.getFullYear() === month.year && t.getMonth() === month.monthIndex && t.getDate() === day
     );
 };
+
+const chartRef = ref<HTMLElement | null>(null);
+
+const linkingFrom = ref<number | null>(null);
+const hoveredTargetId = ref<number | null>(null);
+const cursor = reactive({ x: 0, y: 0 });
+
+const toLocal = (e: MouseEvent) => {
+    const r = chartRef.value!.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+};
+
+const hitTest = (x: number, y: number): number | null => {
+    for (const b of bars.value) {
+        const w = b.days * timescale.dayWidth.value;
+        const h = timescale.dayHeight.value;
+        if (x >= b.x && x <= b.x + w && y >= b.y && y <= b.y + h) {
+            return b.id;
+        }
+    }
+    return null;
+};
+
+const onMouseMove = (e: MouseEvent) => {
+    if (linkingFrom.value == null) return;
+    const p = toLocal(e);
+    cursor.x = p.x;
+    cursor.y = p.y;
+
+    const hitId = hitTest(p.x, p.y);
+
+    // валидная цель: не сам source, не потомок source, в том же спринте
+    if (hitId == null || hitId === linkingFrom.value) {
+        hoveredTargetId.value = null;
+        return;
+    }
+    const sourceBar = bars.value.find((b) => b.id === linkingFrom.value);
+    const targetBar = bars.value.find((b) => b.id === hitId);
+    if (!sourceBar || !targetBar || sourceBar.sprint_id !== targetBar.sprint_id) {
+        hoveredTargetId.value = null;
+        return;
+    }
+    hoveredTargetId.value = hitId;
+};
+
+const onMouseUp = () => {
+    if (linkingFrom.value != null && hoveredTargetId.value != null) {
+        const res = sprintsSource.linkTasks(linkingFrom.value, hoveredTargetId.value);
+        if (!res.ok) console.warn('[gantt] link:', res.error);
+    }
+    stopLink();
+};
+
+const stopLink = () => {
+    linkingFrom.value = null;
+    hoveredTargetId.value = null;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+};
+
+const startLink = (barId: number, e: MouseEvent) => {
+    e.preventDefault();
+    linkingFrom.value = barId;
+    hoveredTargetId.value = null;
+    const p = toLocal(e);
+    cursor.x = p.x;
+    cursor.y = p.y;
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'crosshair';
+};
+
+provide(GANTT_LINK_KEY, { linkingFrom, hoveredTargetId, startLink });
+onBeforeUnmount(stopLink);
+
+const linkPreviewPath = computed(() => {
+    if (linkingFrom.value == null) return null;
+    const from = barById.value.get(linkingFrom.value);
+    if (!from) return null;
+
+    let endX = cursor.x;
+    let endY = cursor.y;
+
+    if (hoveredTargetId.value != null) {
+        const to = barById.value.get(hoveredTargetId.value);
+        if (to) {
+            endX = to.x;
+            endY = to.y + timescale.dayHeight.value / 2;
+        }
+    }
+
+    return buildDependencyPath(
+        from,
+        { x: endX, y: endY },
+        timescale.dayWidth.value,
+        timescale.dayHeight.value
+    );
+});
 </script>
 
 <template>
@@ -226,6 +329,7 @@ const isItToday = (month: IMonth, day: number) => {
     </div>
 
     <div
+      ref="chartRef"
       class="relative"
       :style="{ width: totalWidth + 'px', height: totalHeight + 'px' }"
     >
@@ -306,6 +410,14 @@ const isItToday = (month: IMonth, day: number) => {
           stroke-linejoin="round"
           :marker-end="isLinkActive(link) ? 'url(#arrowhead-active)' : 'url(#arrowhead)'"
         />
+        <path
+          v-if="linkPreviewPath"
+          :d="linkPreviewPath"
+          class="gantt-link gantt-link--preview"
+          fill="none"
+          stroke-linejoin="round"
+          marker-end="url(#arrowhead-active)"
+        />
       </svg>
     </div>
   </div>
@@ -320,8 +432,15 @@ const isItToday = (month: IMonth, day: number) => {
         stroke 0.15s,
         stroke-width 0.15s;
 }
+
 .gantt-link--active {
     stroke: #1e40af;
+    stroke-width: 2;
+}
+
+.gantt-link--preview {
+    stroke: #1e40af;
+    stroke-dasharray: 4 4;
     stroke-width: 2;
 }
 </style>

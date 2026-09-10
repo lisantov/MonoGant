@@ -14,8 +14,8 @@ const weekday = (year: number, monthIndex: number, day: number) =>
 </script>
 
 <template>
-  <div class="flex w-full">
-    <div class="flex border-b border-gray-400">
+  <div class="flex w-full sticky top-0 z-999">
+    <div class="flex border-b border-gray-400 bg-white">
       <div
         v-for="month in months"
         :key="`${month.year}-${month.monthIndex}`"
