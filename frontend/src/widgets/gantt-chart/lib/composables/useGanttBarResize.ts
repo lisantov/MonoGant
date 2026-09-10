@@ -6,52 +6,66 @@ interface IBarLike {
 }
 
 interface Options {
-    /** ширина одного дня в пикселях */
     dayWidth: Ref<number> | number;
-    /** минимальное число дней, до которого можно сжать бар */
     minDays?: number;
-    /** запретить уезжать левым краем левее нуля */
     minX?: number;
-    /** колбэк с новым состоянием — сюда пишем в store / emit */
+    maxX?: number;
     onChange: (next: { x: number; days: number }) => void;
 }
 
 export function useGanttBarResize(getBar: () => IBarLike, options: Options) {
-    const { dayWidth, minDays = 1, minX = 0, onChange } = options;
+    const { dayWidth, minDays = 1, minX = 0, maxX = Infinity, onChange } = options;
+
     const isResizing = ref(false);
+    /** снапнутая позиция призрака (px) */
+    const ghostX = ref(0);
+    /** снапнутая ширина призрака (в днях) */
+    const ghostDays = ref(1);
 
     let side: 'left' | 'right' = 'right';
     let startX = 0;
     let startLeft = 0;
     let startDays = 1;
 
-    const onMouseMove = (e: MouseEvent) => {
+    const computeTarget = (clientX: number) => {
         const dw = unref(dayWidth);
-        const dx = e.clientX - startX;
-        // округляем до целых дней — бар «магнитится» к сетке
-        const deltaDays = Math.round(dx / dw);
-
-        let nextX = startLeft;
-        let nextDays = startDays;
+        const deltaDays = Math.round((clientX - startX) / dw);
 
         if (side === 'right') {
-            // правая ручка: меняем только days
-            nextDays = Math.max(minDays, startDays + deltaDays);
-        } else {
-            // левая ручка: двигаем x, days уменьшается на ту же величину
-            // но не даём схлопнуть бар меньше minDays и уехать левее minX
-            const minLeftDelta = Math.ceil((minX - startLeft) / dw); // отрицательное или 0
-            const maxLeftDelta = startDays - minDays; // положительное
-            const leftDelta = Math.max(minLeftDelta, Math.min(deltaDays, maxLeftDelta));
+            let days = startDays + deltaDays;
+            days = Math.max(minDays, days);
 
-            nextX = startLeft + leftDelta * dw;
-            nextDays = startDays - leftDelta;
+            // не даём правому краю выйти за maxX
+            const maxDays = Math.floor((maxX - startLeft) / dw);
+            days = Math.min(days, maxDays);
+
+            return { x: startLeft, days };
         }
 
-        onChange({ x: nextX, days: nextDays });
+        // left: двигаем x, days компенсируем, чтобы правый край стоял
+        const minLeftDelta = Math.ceil((minX - startLeft) / dw); // <= 0
+        const maxLeftDelta = startDays - minDays; // >= 0
+        const leftDelta = Math.max(minLeftDelta, Math.min(deltaDays, maxLeftDelta));
+
+        return {
+            x: startLeft + leftDelta * dw,
+            days: startDays - leftDelta,
+        };
     };
 
-    const onMouseUp = () => {
+    const onMouseMove = (e: MouseEvent) => {
+        const { x, days } = computeTarget(e.clientX);
+        ghostX.value = x;
+        ghostDays.value = days;
+    };
+
+    const onMouseUp = (e: MouseEvent) => {
+        if (isResizing.value) {
+            const { x, days } = computeTarget(e.clientX);
+            if (x !== startLeft || days !== startDays) {
+                onChange({ x, days });
+            }
+        }
         isResizing.value = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
@@ -60,12 +74,17 @@ export function useGanttBarResize(getBar: () => IBarLike, options: Options) {
     };
 
     const start = (e: MouseEvent, s: 'left' | 'right') => {
+        if (e.button !== 0) return;
         e.preventDefault();
+
         const bar = getBar();
         side = s;
         startX = e.clientX;
         startLeft = bar.x;
         startDays = bar.days;
+
+        ghostX.value = bar.x;
+        ghostDays.value = bar.days;
         isResizing.value = true;
 
         document.addEventListener('mousemove', onMouseMove);
@@ -78,6 +97,8 @@ export function useGanttBarResize(getBar: () => IBarLike, options: Options) {
 
     return {
         isResizing,
+        ghostX,
+        ghostDays,
         startLeft: (e: MouseEvent) => start(e, 'left'),
         startRight: (e: MouseEvent) => start(e, 'right'),
     };
