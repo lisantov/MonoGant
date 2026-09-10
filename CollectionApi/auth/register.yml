@@ -1,0 +1,23 @@
+info:
+  name: register
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}{{prefix}}/register"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "sasalele",
+        "password": "QWEasd123!!!",
+        "email": "email@email.com"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
