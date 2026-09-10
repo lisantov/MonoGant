@@ -7,6 +7,10 @@ export const Routes = {
         path: '/auth/login',
         name: 'login',
     },
+    register: {
+        path: '/auth/register',
+        name: 'register',
+    },
     notFound: {
         path: '/:pathMatch(.*)*',
         name: 'notFound',
