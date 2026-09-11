@@ -43,7 +43,10 @@ const onSubmit = handleSubmit((values) => {
       />
     </div>
     <div class="flex flex-col w-full justify-center gap-[15px]">
-      <app-button type="submit">
+      <app-button
+        variant-button="accent"
+        type="submit"
+      >
         Войти
       </app-button>
       <p class="text-white font-montserrat font-normal text-[18px] text-center">
