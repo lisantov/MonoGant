@@ -25,7 +25,7 @@ class CreateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:90', 'min: 1'],
             'started_at' => ['required', 'date'],
             'deadline_at' => ['date'],
         ];

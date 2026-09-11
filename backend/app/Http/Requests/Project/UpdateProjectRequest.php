@@ -27,7 +27,7 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['string'],
+            'name' => ['string', 'max:90', 'min: 1'],
             'started_at' => ['date'],
             'deadline_at' => ['date'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
