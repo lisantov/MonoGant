@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { AppButton, AppInput, Routes } from '@/shared';
+import { AppButton, AppInput, AppLink, Routes } from '@/shared';
 import { useRegister } from '@/entities';
 import { useForm } from 'vee-validate';
 import { registerSchema } from '@/features';
@@ -75,8 +75,9 @@ const onSubmit = handleSubmit((values) => {
     >
       Регистрация
     </app-button>
-    <p class="text-[18px] font-montserrat text-white">
-      Впервые на платформе? <AppLink to="register">
+    <p class="text-[18px] font-montserrat text-white text-center">
+      Впервые на платформе?
+      <AppLink to="register">
         Зарегистрироваться
       </AppLink>
     </p>
