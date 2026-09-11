@@ -76,7 +76,7 @@ const onSubmit = handleSubmit((values) => {
     >
       Регистрация
     </app-button>
-    <p class="text-[18px] font-montserrat text-white">
+    <p class="text-[18px] font-montserrat text-white text-center">
       У вас есть аккаунт? <AppLink to="login">
         Войти
       </AppLink>
