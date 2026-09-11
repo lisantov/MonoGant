@@ -8,6 +8,7 @@ use App\Actions\Project\RemoveProjectMemberAction;
 use App\Actions\Project\SetProjectMemberRoleAction;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Project\CreateProjectRequest;
+use App\Http\Requests\Project\RemoveProjectMemberRequest;
 use App\Http\Requests\Project\SetProjectMemberRoleRequest;
 use App\Http\Requests\Project\StoreProjectMembersRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
@@ -117,6 +118,24 @@ class ProjectController extends Controller
                 'user' => new UserResource($member),
                 'role' => $pivot->role,
             ],
+        ]);
+    }
+
+    /**
+     * Remove a member from the project by email (owner or responsible)
+     */
+    public function removeMemberByEmail(RemoveProjectMemberRequest $request, Project $project)
+    {
+        if (! Gate::inspect('project-remove-member', $project)->allowed()) {
+            throw new AccessDeniedHttpException;
+        }
+
+        $member = User::where('email', $request->validated()['email'])->firstOrFail();
+
+        RemoveProjectMemberAction::run($project, $member);
+
+        return response()->json([
+            'message' => 'Member removed successfully',
         ]);
     }
 

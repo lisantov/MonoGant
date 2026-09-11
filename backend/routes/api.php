@@ -31,6 +31,7 @@ Route::group(['prefix' => '/projects/', 'middleware' => 'auth:sanctum'], functio
         ->where(['id' => '[0-9]+']);
     Route::get('parse/{project}', [ProjectController::class, 'parse']);
     Route::post('/{project}/members', [ProjectController::class, 'storeMembers']);
+    Route::post('/{project}/members/remove', [ProjectController::class, 'removeMemberByEmail']);
     Route::patch('/{project}/members/{member}', [ProjectController::class, 'setMemberRole']);
     Route::delete('/{project}/members/{member}', [ProjectController::class, 'removeMember']);
 });

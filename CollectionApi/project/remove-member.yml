@@ -4,8 +4,14 @@ info:
   seq: 8
 
 http:
-  method: DELETE
-  url: "{{host}}{{prefix}}/projects/1/members/2"
+  method: POST
+  url: "{{host}}{{prefix}}/projects/1/remove"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "email@email.com"
+      }
   auth: inherit
 
 settings:
