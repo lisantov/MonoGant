@@ -1,0 +1,23 @@
+info:
+  name: update profile
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{host}}{{prefix}}/user"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "sasis@gmail.com",
+        "name": "sasa ле лё"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

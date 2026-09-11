@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', [UserController::class, 'profile'])->middleware('auth:sanctum');
+Route::patch('/user', [UserController::class, 'update'])->middleware('auth:sanctum');
 
 Route::get('/hi', [AuthController::class, 'index']);
 
