@@ -1,9 +1,9 @@
 export interface Account {
-    id: number;
-    email: string;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+    projects: [];
 }
 
 export interface LoginBody {
