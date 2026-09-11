@@ -1,6 +1,6 @@
 <template>
   <section class="relative w-full overflow-x-hidden text-white">
-    <div class="flex mx-auto min-h-screen max-w-6xl items-center gap-20">
+    <div class="flex mx-auto contentBlock max-w-6xl items-center gap-20">
       <div class="space-y-12">
         <app-button
           variant-button="solid"
@@ -113,3 +113,8 @@ const { openModal } = useModal();
 
 const router = useRouter();
 </script>
+<style scoped>
+.contentBlock {
+    height: calc(100vh - 100px);
+}
+</style>
