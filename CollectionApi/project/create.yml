@@ -12,7 +12,7 @@ http:
       {
         "name": "project",
         "started_at": "2026-09-10",
-        "deadline_at": "2026-09-11"
+        "deadline_at": "2026-09-21"
       }
   auth: inherit
 

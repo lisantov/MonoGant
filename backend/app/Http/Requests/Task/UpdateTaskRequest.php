@@ -59,6 +59,12 @@ class UpdateTaskRequest extends FormRequest
                 return;
             }
 
+            $projectStartedAt = $sprint->project->started_at;
+
+            if ($projectStartedAt !== null && Carbon::parse($startedAt)->lt($projectStartedAt)) {
+                $validator->errors()->add('started_at', 'The task cannot start before the project starts.');
+            }
+
             $conflict = $sprint->dateRangeConflict(
                 Carbon::parse($startedAt),
                 Carbon::parse($deadlineAt),

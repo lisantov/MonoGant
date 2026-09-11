@@ -47,8 +47,15 @@ class StoreTaskRequest extends FormRequest
                 return;
             }
 
+            $startedAt = Carbon::parse($this->input('started_at'));
+            $projectStartedAt = $sprint->project->started_at;
+
+            if ($projectStartedAt !== null && $startedAt->lt($projectStartedAt)) {
+                $validator->errors()->add('started_at', 'The task cannot start before the project starts.');
+            }
+
             $conflict = $sprint->dateRangeConflict(
-                Carbon::parse($this->input('started_at')),
+                $startedAt,
                 Carbon::parse($this->input('deadline_at')),
             );
 

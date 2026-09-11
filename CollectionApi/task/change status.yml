@@ -1,11 +1,17 @@
 info:
-  name: delete
+  name: change status
   type: http
-  seq: 5
+  seq: 7
 
 http:
-  method: DELETE
+  method: PATCH
   url: "{{host}}{{prefix}}/tasks/2"
+  body:
+    type: json
+    data: |-
+      {
+        "status": "done"
+      }
   auth: inherit
 
 settings:

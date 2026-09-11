@@ -166,4 +166,25 @@ class Sprint extends Model
 
         return null;
     }
+
+    public function completedTasksCount(): int
+    {
+        return $this->tasks->filter(fn (Task $task): bool => $task->status === StatusEnum::Done)->count();
+    }
+
+    public function totalTasksCount(): int
+    {
+        return $this->tasks->filter(fn (Task $task): bool => $task->status !== StatusEnum::Cancelled)->count();
+    }
+
+    public function completionPercentage(): int
+    {
+        $total = $this->totalTasksCount();
+
+        if ($total === 0) {
+            return 0;
+        }
+
+        return (int) round($this->completedTasksCount() / $total * 100);
+    }
 }
