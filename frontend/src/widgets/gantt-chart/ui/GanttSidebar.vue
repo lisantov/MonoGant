@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import { inject, ref, reactive } from 'vue';
-import { SPRINTS_KEY, GANTT_TASK_TEXT, TIMESCALE_KEY } from '../lib';
+import { useQueryCache } from '@pinia/colada';
+import { SPRINTS_KEY, GANTT_TASK_TEXT, TIMESCALE_KEY, formatDate } from '../lib';
 import { AppButton, AppInput } from '@/shared';
+import { useModal } from '@/shared';
+import { PROJECT_QUERY_KEYS, useCreateSprint } from '@/entities';
+import type { User } from '@/entities';
+import ModalTask from '../../modals/ui/modalTask.vue';
+
+interface IProps {
+    projectId?: number;
+    members?: Array<User>;
+}
+const props = defineProps<IProps>();
 
 const sprintsStore = inject(SPRINTS_KEY)!;
 const timescale = inject(TIMESCALE_KEY)!;
@@ -11,14 +22,30 @@ const { minStart, maxEnd } = timescale.getBounds(tasks);
 
 const newSprintName = ref('');
 const collapsed = reactive(new Set<number>());
+const activeTaskSprint = ref<{ id: number; name: string } | null>(null);
+
+const { mutateAsync: createSprintMutation } = useCreateSprint();
+const queryCache = useQueryCache();
+const { openModal } = useModal();
 
 const toggle = (id: number) => (collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id));
 
-const createSprint = () => {
+const createSprint = async () => {
     const name = newSprintName.value.trim();
-    if (!name) return;
-    sprintsStore.addSprint(name);
+    if (!name || !props.projectId) return;
+    const { sprint } = await createSprintMutation({
+        projectId: props.projectId,
+        name,
+        description: '',
+    });
+    sprintsStore.addSprint(sprint.name, sprint.id);
+    queryCache.invalidateQueries({ key: PROJECT_QUERY_KEYS.parse(props.projectId) });
     newSprintName.value = '';
+};
+
+const openTaskModal = (sprint: { id: number; name: string }) => {
+    activeTaskSprint.value = sprint;
+    openModal('taskApp');
 };
 </script>
 
@@ -29,7 +56,7 @@ const createSprint = () => {
         Задачи команды
       </h2>
       <p class="text-sm text-dark-blue-gray font-jost font-regular">
-        {{ minStart?.toLocaleDateString('ru') }} - {{ maxEnd?.toLocaleDateString('ru') }}
+        {{ formatDate(minStart!) }} - {{ formatDate(maxEnd!) }}
       </p>
     </div>
 
@@ -79,7 +106,7 @@ const createSprint = () => {
             <button
               class="w-6 h-6 pb-[1px] rounded hover:text-white/90 hover:bg-white/20 transition duration-200 cursor-pointer text-white/60 text-lg leading-none flex items-center justify-center shrink-0"
               title="Добавить задачу"
-              @click="sprintsStore.addTask(sprint.id)"
+              @click="openTaskModal({ id: sprint.id, name: sprint.name })"
             >
               +
             </button>
@@ -87,7 +114,7 @@ const createSprint = () => {
 
           <ul
             v-show="!collapsed.has(sprint.id)"
-            class="flex-1 overflow-y-auto divide-y divide-gray-100"
+            class="flex-1 overflow-y-auto divide-y divide-dark-blue-gray"
           >
             <li
               v-for="task in sprint.tasks"
@@ -97,7 +124,8 @@ const createSprint = () => {
               <span class="truncate text-white">{{ task.name }}</span>
               <span class="text-[12px] text-dark-blue-gray">
                 {{ GANTT_TASK_TEXT.get(task.status) }}
-                · {{ task.started_at }} → {{ task.deadline_at }}
+                · {{ formatDate(new Date(task.started_at)) }} →
+                {{ formatDate(new Date(task.deadline_at)) }}
               </span>
             </li>
           </ul>
@@ -119,4 +147,12 @@ const createSprint = () => {
       </div>
     </div>
   </aside>
+
+  <modal-task
+    v-if="activeTaskSprint"
+    :project-id="projectId"
+    :sprint-id="activeTaskSprint.id"
+    :sprint-name="activeTaskSprint.name"
+    :user-options="members ?? []"
+  />
 </template>

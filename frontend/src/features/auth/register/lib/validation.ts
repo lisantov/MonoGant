@@ -12,7 +12,6 @@ const registrationSchemaRaw = z
     .refine((data) => data.password === data.confirmPassword, {
         message: 'Пароли не совпадают',
         path: ['confirmPassword'],
-        when: () => true,
     });
 
 export const registerSchema = toTypedSchema(registrationSchemaRaw);

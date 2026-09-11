@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', [UserController::class, 'profile'])->middleware('auth:sanctum');
+Route::patch('/user', [UserController::class, 'update'])->middleware('auth:sanctum');
 
 Route::get('/hi', [AuthController::class, 'index']);
 
@@ -30,6 +31,7 @@ Route::group(['prefix' => '/projects/', 'middleware' => 'auth:sanctum'], functio
         ->where(['id' => '[0-9]+']);
     Route::get('parse/{project}', [ProjectController::class, 'parse']);
     Route::post('/{project}/members', [ProjectController::class, 'storeMembers']);
+    Route::post('/{project}/members/remove', [ProjectController::class, 'removeMemberByEmail']);
     Route::patch('/{project}/members/{member}', [ProjectController::class, 'setMemberRole']);
     Route::delete('/{project}/members/{member}', [ProjectController::class, 'removeMember']);
 });

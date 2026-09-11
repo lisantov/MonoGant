@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue';
+import { useUpdateTask } from '@/entities';
 import {
     useGanttBarResize,
     useGanttBarDrag,
@@ -22,6 +23,8 @@ const sprints = inject(SPRINTS_KEY)!;
 
 const { hoveredBarId } = inject(GANTT_UI_KEY)!;
 
+const { mutateAsync: updateTask } = useUpdateTask();
+
 // локальная копия для composable'ов (нужен актуальный объект под рукой)
 const currentBar = ref<IGanttBar>({ ...props.bar });
 watch(
@@ -40,6 +43,22 @@ const commit = (patch: Partial<Pick<IGanttBar, 'x' | 'days'>>) => {
         { x: currentBar.value.x, days: currentBar.value.days },
         timescale
     );
+
+    persistBarDates();
+};
+
+const persistBarDates = () => {
+    const sprint = sprints.sprints.value.find((s) => s.id === currentBar.value.sprint_id);
+    const task = sprint?.tasks.find((t) => t.id === currentBar.value.id);
+    if (!task) return;
+
+    updateTask({
+        id: task.id,
+        data: {
+            started_at: task.started_at,
+            deadline_at: task.deadline_at,
+        },
+    }).catch(() => {});
 };
 
 const {

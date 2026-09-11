@@ -1,57 +1,66 @@
 <script setup lang="ts">
-import { AppButton, AppInput, AppLink } from '@/shared';
+import { useRouter } from 'vue-router';
+import { AppButton, AppInput, AppLink, Routes } from '@/shared';
 import { useForm } from 'vee-validate';
 import { loginSchema } from '@/features';
 import { useLogin } from '@/entities';
 
-const { mutateAsync } = useLogin();
+const router = useRouter();
 
-const { defineField, handleSubmit, errors } = useForm({
+const { defineField, errors, handleSubmit } = useForm({
     validationSchema: loginSchema,
 });
+
+const { mutateAsync: login, isLoading } = useLogin();
 
 const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 
 const onSubmit = handleSubmit((values) => {
-    mutateAsync(values);
+    login({ email: values.email, password: values.password }).then(() => {
+        router.push(Routes.main.path);
+    });
 });
 </script>
 
 <template>
   <form
-    class="flex w-full h-full flex-col justify-between items-center py-[120px] px-[90px]"
+    class="linear-border flex flex-col justify-center gap-15 px-30"
     @submit.prevent="onSubmit"
   >
-    <h2 class="text-[60px] text-white font-jost font-semibold text-center">
+    <h2 class="text-[60px] font-jost font-semibold text-center text-white">
       Вход в аккаунт
     </h2>
-    <div class="flex w-full flex-col justify-center gap-10">
-      <app-input
-        v-model="email"
-        placeholder="Логин"
-        :error="errors.email"
-        v-bind="emailAttrs"
-        required
-      />
-      <app-input
-        v-model="password"
-        placeholder="Пароль"
-        :error="errors.password"
-        v-bind="passwordAttrs"
-        required
-      />
-    </div>
-    <div class="flex flex-col w-full justify-center gap-[15px]">
-      <app-button type="submit">
-        Войти
-      </app-button>
-      <p class="text-white font-montserrat font-normal text-[18px] text-center">
-        У вас нет аккаунта?
-        <AppLink to="register">
-          Зарегистрироваться
-        </AppLink>
-      </p>
+    <div class="flex flex-col gap-20 justify-center">
+      <div class="flex flex-col gap-5">
+        <app-input
+          v-model="email"
+          placeholder="Email"
+          :error="errors.email"
+          v-bind="emailAttrs"
+        />
+        <app-input
+          v-model="password"
+          type="password"
+          placeholder="Пароль"
+          :error="errors.password"
+          v-bind="passwordAttrs"
+        />
+      </div>
+      <div class="flex flex-col gap-5 items-center">
+        <app-button
+          type="submit"
+          :disabled="!!Object.keys(errors).length || isLoading"
+          variant-button="accent"
+        >
+          Войти
+        </app-button>
+        <p class="text-[18px] font-montserrat text-white">
+          Впервые на платформе? <AppLink to="register">
+            Зарегистрироваться
+          </AppLink>
+        </p>
+      </div>
     </div>
   </form>
 </template>

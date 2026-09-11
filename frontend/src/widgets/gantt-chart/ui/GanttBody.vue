@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, inject, provide, ref, onBeforeUnmount, reactive } from 'vue';
+import { useUpdateTask } from '@/entities';
 import { GanttBar } from '.';
 import {
     buildDependencyPath,
@@ -25,6 +26,8 @@ defineProps<IProps>();
 const timescale = inject(TIMESCALE_KEY)!;
 const sprintsSource = inject(SPRINTS_KEY)!;
 
+const { mutateAsync: updateTask } = useUpdateTask();
+
 const hoveredBarId = ref<number | null>(null);
 provide(GANTT_UI_KEY, { hoveredBarId });
 
@@ -35,7 +38,10 @@ const dayStart = (d: Date) => {
     x.setHours(0, 0, 0, 0);
     return x;
 };
-const dayDiff = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
+const dayDiff = (a: Date, b: Date) => {
+    const result = Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
+    return result;
+};
 
 /** Раскладка спринтов: x, y, width, height */
 const sprintLayouts = computed<IGanttSprintBar[]>(() => {
@@ -208,6 +214,25 @@ const linkingFrom = ref<number | null>(null);
 const hoveredTargetId = ref<number | null>(null);
 const cursor = reactive({ x: 0, y: 0 });
 
+const nextTaskBefore = new Map<number, number | null>();
+
+const snapshotNextTaskIds = () => {
+    nextTaskBefore.clear();
+    for (const s of sprintsSource.sprints.value) {
+        for (const t of s.tasks) nextTaskBefore.set(t.id, t.next_task_id ?? null);
+    }
+};
+
+const syncLinkChanges = () => {
+    for (const s of sprintsSource.sprints.value) {
+        for (const t of s.tasks) {
+            const next = t.next_task_id ?? null;
+            if (nextTaskBefore.get(t.id) === next) continue;
+            updateTask({ id: t.id, data: { next_task_id: next } }).catch(() => {});
+        }
+    }
+};
+
 const toLocal = (e: MouseEvent) => {
     const r = chartRef.value!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -249,7 +274,11 @@ const onMouseMove = (e: MouseEvent) => {
 const onMouseUp = () => {
     if (linkingFrom.value != null && hoveredTargetId.value != null) {
         const res = sprintsSource.linkTasks(linkingFrom.value, hoveredTargetId.value);
-        if (!res.ok) console.warn('[gantt] link:', res.error);
+        if (!res.ok) {
+            console.warn('[gantt] link:', res.error);
+        } else {
+            syncLinkChanges();
+        }
     }
     stopLink();
 };
@@ -265,6 +294,7 @@ const stopLink = () => {
 
 const startLink = (barId: number, e: MouseEvent) => {
     e.preventDefault();
+    snapshotNextTaskIds();
     linkingFrom.value = barId;
     hoveredTargetId.value = null;
     const p = toLocal(e);
@@ -306,8 +336,7 @@ const linkPreviewPath = computed(() => {
 </script>
 
 <template>
-  <div class="flex w-full relative">
-    <!-- сетка -->
+  <div class="flex w-full relative h-full">
     <div class="absolute inset-0 flex">
       <div
         v-for="month in months"
@@ -322,7 +351,7 @@ const linkPreviewPath = computed(() => {
         >
           <div
             v-if="isItToday(month, day)"
-            class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 z-999 opacity-20"
+            class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 opacity-20"
           />
         </div>
       </div>
@@ -331,7 +360,6 @@ const linkPreviewPath = computed(() => {
     <div
       ref="chartRef"
       class="relative"
-      :style="{ width: totalWidth + 'px', height: totalHeight + 'px' }"
     >
       <div
         v-for="sprint in sprintLayouts"
