@@ -4,7 +4,7 @@
       <div class="space-y-12">
         <app-button
           variant-button="solid"
-          @click="openModal('mini')"
+          @click="openModal('taskApp')"
         >
           Модалка
         </app-button>
@@ -102,6 +102,7 @@
           </ul>
         </div>
       </div>
+      <modal-task />
       <AppMiniModal />
     </div>
   </section>
@@ -109,6 +110,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { AppButton, AppMiniModal, useModal } from '@/shared';
+import ModalTask from '@/features/modal/task/ui/modalTask.vue';
 const { openModal } = useModal();
 
 const router = useRouter();
