@@ -351,7 +351,7 @@ const linkPreviewPath = computed(() => {
         >
           <div
             v-if="isItToday(month, day)"
-            class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 z-999 opacity-20"
+            class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 opacity-20"
           />
         </div>
       </div>
@@ -372,7 +372,6 @@ const linkPreviewPath = computed(() => {
           backgroundColor: sprint.color.bg,
         }"
       >
-        {{ sprint.days }}
         <div
           class="w-min flex items-center justify-center whitespace-nowrap gap-2 px-3 py-2 font-jost font-regular text-md text-input-placeholder bg-input-placeholder-hover/10 border border-input-placeholder-hover/20 rounded-[10px]"
         >

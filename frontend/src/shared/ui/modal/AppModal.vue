@@ -3,7 +3,7 @@
     <transition name="fade">
       <div
         v-if="currentModal === name"
-        class="app-modal fixed flex justify-center items-center top-0 left-0 right-0 bottom-0 z-[100]"
+        class="app-modal fixed flex justify-center items-center top-0 left-0 right-0 bottom-0 z-99999"
       >
         <div
           ref="modalEl"

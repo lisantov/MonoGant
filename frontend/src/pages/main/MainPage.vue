@@ -5,7 +5,7 @@ import { push } from 'notivue';
 import { AppButton, AppIcon, SwitchProject, AppModal, AppMiniModal, useModal } from '@/shared';
 import { Routes } from '@/shared/lib';
 import { useProjects, useDeleteProject, useLogout, type Project, useProfile } from '@/entities';
-import { FormCreateProject, FormEditProject } from '@/features';
+import { FormCreateProject, FormEditProject, FormChangePassword } from '@/features';
 
 const { data: profile } = useProfile();
 const { data: projects, isLoading } = useProjects();
@@ -171,7 +171,7 @@ const onNotAvailable = (message: string) => push.info(message);
         </div>
         <app-button
           variant-button="solid"
-          @click="onNotAvailable('Смена пароля недоступна')"
+          @click="openModal('changePassword')"
         >
           Сменить пароль
         </app-button>
@@ -222,6 +222,15 @@ const onNotAvailable = (message: string) => push.info(message);
           Удалить
         </app-button>
       </div>
+    </div>
+  </app-modal>
+
+  <app-modal name="changePassword">
+    <div class="flex flex-col gap-4 bg-gray p-8 rounded-[20px] w-[420px] text-white">
+      <h2 class="text-2xl font-jost">
+        Сменить пароль
+      </h2>
+      <form-change-password />
     </div>
   </app-modal>
 
