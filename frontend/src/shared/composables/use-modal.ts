@@ -1,7 +1,13 @@
 import { ref } from 'vue';
 
 type Modal =
-    'taskApp' | 'mini' | 'projectCreate' | 'projectEdit' | 'projectDelete' | 'changePassword';
+    | 'taskApp'
+    | 'mini'
+    | 'projectCreate'
+    | 'projectEdit'
+    | 'projectDelete'
+    | 'changePassword'
+    | 'EditTeam';
 
 const currentModal = ref<Modal | null>(null);
 
