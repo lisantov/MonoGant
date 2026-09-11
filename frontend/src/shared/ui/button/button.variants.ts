@@ -4,7 +4,6 @@ export const buttonVariants = tv({
     base:
         'flex items-center justify-center w-full box-border min-w-fit' +
         ' disabled:cursor-default hover:cursor-pointer' +
-        ' p-5 ' +
         ' font-montserrat text-white text-xl font-semibold' +
         ' [box-shadow:0_0_4px_0px_rgba(2,255,11,0.2)]' +
         ' transition-colors duration-200 ease-out' +
@@ -31,6 +30,11 @@ export const buttonVariants = tv({
                 ' hover:bg-light-gray hover:border-input-placeholder' +
                 ' active:bg-input-outline active:border-light-gray' +
                 ' focus:bg-input-outline focus:border-light-gray focus:text-white/80',
+        },
+        size: {
+            sm: 'p-2 px-4.5 w-min',
+            md: 'p-3',
+            lg: 'p-5',
         },
     },
 });

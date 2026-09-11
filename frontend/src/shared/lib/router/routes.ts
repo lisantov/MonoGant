@@ -15,6 +15,10 @@ export const Routes = {
         path: '/gantt',
         name: 'gantt',
     },
+    ganttById: {
+        path: '/gantt/:id',
+        name: 'ganttId',
+    },
     register: {
         path: '/auth/register',
         name: 'register',
@@ -25,6 +29,11 @@ export const Routes = {
     },
 } as const;
 
-export const ProtectedRoutes: string[] = [] as const;
+export const ProtectedRoutes: string[] = [
+    Routes.gantt.path,
+    Routes.ganttById.path,
+    Routes.main.path,
+] as const;
+export const GuestRoutes: string[] = [Routes.login.path, Routes.register.path] as const;
 
 export type RouteName = keyof typeof Routes;

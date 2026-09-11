@@ -1,2 +1,8 @@
 export { TASK_QUERY_KEYS } from './task.keys';
-export { useCreateTask } from './task.queries';
+export {
+    useTasksBySprint,
+    useTask,
+    useCreateTask,
+    useUpdateTask,
+    useDeleteTask,
+} from './task.queries';

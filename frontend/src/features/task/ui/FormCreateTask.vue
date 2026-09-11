@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { AppButton, AppInput } from '@/shared';
 import { useForm } from 'vee-validate';
+import { useQueryCache } from '@pinia/colada';
 import { taskCreateSchema } from '@/features';
-import { useCreateTask, type Account } from '@/entities';
+import { useCreateTask, PROJECT_QUERY_KEYS, type Task } from '@/entities';
 
 interface IProps {
     sprintId: number;
-    userOptions: Omit<Account, 'createdAt' | 'updatedAt'>[];
+    userOptions: Array<{ name: string; email: string }>;
+    projectId?: number;
 }
 const props = defineProps<IProps>();
+
+const emit = defineEmits<{
+    created: [task: Task];
+}>();
 
 const { defineField, errors, handleSubmit } = useForm({
     validationSchema: taskCreateSchema,
 });
 
 const { mutateAsync, isLoading } = useCreateTask();
+const queryCache = useQueryCache();
 
 const [name, nameAttrs] = defineField('name');
 const [description, descriptionAttrs] = defineField('description');
@@ -22,8 +29,12 @@ const [started_at] = defineField('started_at');
 const [deadline_at] = defineField('deadline_at');
 const [user_email] = defineField('user_email');
 
-const onSubmit = handleSubmit((values) => {
-    mutateAsync({ ...values, sprintId: props.sprintId });
+const onSubmit = handleSubmit(async (values) => {
+    const created = await mutateAsync({ ...values, sprintId: props.sprintId });
+    emit('created', created?.task);
+    if (props.projectId) {
+        queryCache.invalidateQueries({ key: PROJECT_QUERY_KEYS.parse(props.projectId) });
+    }
 });
 </script>
 
@@ -48,14 +59,27 @@ const onSubmit = handleSubmit((values) => {
         />
         <select
           v-model="user_email"
-          placeholder="Выбрать исполнителя"
+          class="rounded-[10px] border-[1px] border-accent-light px-[12px] py-[10px] text-[18px] text-dark-gray bg-white outline-none"
         >
           <option
+            value=""
+            disabled
+          >
+            Выбрать исполнителя
+          </option>
+          <option
+            v-if="!userOptions.length"
+            value=""
+            disabled
+          >
+            Нет участников
+          </option>
+          <option
             v-for="option in userOptions"
-            :key="option.id"
+            :key="option.email"
             :value="option.email"
           >
-            {{ `${option.lastName} ${option.firstName}` }}
+            {{ option.name }}
           </option>
         </select>
         <input

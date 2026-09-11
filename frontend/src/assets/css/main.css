@@ -14,6 +14,11 @@
     --widget-accent: #10b981;
     --accent-dark: #196b1c;
     --auxiliary: #63eddc;
+    --blue: #3b82f6;
+    --dark-blue: #1e3a5f;
+    --purple: #8b5cf6;
+    --pink: #ec4899;
+    --dark-blue-gray: #4b5563;
     --input-outline: #323232;
     --input-placeholder: #666666;
     --placeholder-hover: #888888;
@@ -43,6 +48,11 @@
     --color-widget-accent: var(--widget-accent);
     --color-accent-dark: var(--accent-dark);
     --color-auxiliary: var(--auxiliary);
+    --color-blue: var(--blue);
+    --color-dark-blue: var(--dark-blue);
+    --color-purple: var(--purple);
+    --color-pink: var(--pink);
+    --color-dark-blue-gray: var(--dark-blue-gray);
     --color-input-outline: var(--input-outline);
     --color-input-placeholder: var(--input-placeholder);
     --color-placeholder-hover: var(--placeholder-hover);

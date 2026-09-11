@@ -104,11 +104,7 @@
       </div>
       <modal-task
         :sprint-id="1"
-        :user-options="[
-          {
-            id: 1,
-          },
-        ]"
+        :user-options="[]"
       />
       <AppMiniModal />
     </div>
@@ -117,7 +113,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { AppButton, AppMiniModal, useModal } from '@/shared';
-import ModalTask from '@/features/modal/task/ui/modalTask.vue';
+import ModalTask from '@/widgets/modals/ui/modalTask.vue';
 const { openModal } = useModal();
 
 const router = useRouter();
