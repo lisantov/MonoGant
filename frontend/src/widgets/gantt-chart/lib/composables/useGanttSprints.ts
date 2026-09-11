@@ -90,7 +90,6 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
         sprints.value = sprints.value.map((s) => {
             if (s.id !== sprintId) return s;
 
-            // ── вычисляем «сегодня» и «завтра» как fallback ──
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const tomorrow = new Date(today);
@@ -100,7 +99,7 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
                 `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
             // ── если спринт пуст — начинаем со дня после последнего спринта ──
-            let defaultStart = today;
+            let defaultStart;
             if (s.tasks.length === 0) {
                 // ищем самый поздний deadline_at среди задач ДРУГИХ спринтов
                 let latest: Date | null = null;
@@ -116,9 +115,12 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
                     defaultStart = new Date(latest);
                     defaultStart.setDate(defaultStart.getDate() + 1);
                 }
+            } else {
+                defaultStart = new Date(s.tasks[s.tasks.length - 1]!.deadline_at);
+                defaultStart.setDate(defaultStart.getDate() + 1);
             }
 
-            const defaultEnd = new Date(defaultStart);
+            const defaultEnd = new Date(defaultStart!);
             defaultEnd.setDate(defaultEnd.getDate() + 1); // 2-дневная задача по умолчанию
 
             const localId = Math.max(0, ...s.tasks.map((t) => t.id)) + 1;
@@ -129,7 +131,7 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
                 id: globalId,
                 name: task.name ?? `Задача ${localId}`,
                 description: task.description ?? '',
-                started_at: task.started_at ?? fmtDate(defaultStart),
+                started_at: task.started_at ?? fmtDate(defaultStart!),
                 deadline_at: task.deadline_at ?? fmtDate(defaultEnd),
                 status: task.status ?? GANTT_TASK_STATUS.PLANNED,
                 next_task_id: task.next_task_id ?? null,

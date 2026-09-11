@@ -3,8 +3,8 @@ import type { IGanttTask, IGanttConfig } from '../types';
 import { addDays, daysBetween, startOfDay } from '../utils';
 
 const DEFAULT_CONFIG: IGanttConfig = {
-    dayWidth: 40,
-    dayHeight: 40,
+    dayWidth: 120,
+    dayHeight: 72,
     minDayWidth: 15,
     maxDayWidth: 100,
 };

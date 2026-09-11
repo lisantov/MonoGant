@@ -9,6 +9,7 @@ import {
     type IGanttBar,
     GANTT_TASK_STYLE,
     GANTT_LINK_KEY,
+    GANTT_TASK_TEXT,
 } from '../lib';
 
 interface IProps {
@@ -87,13 +88,15 @@ const onLinkHandleDown = (e: MouseEvent) => {
 
 <template>
   <div
-    class="gantt-bar absolute flex text-sm border rounded-md ring-0 ring-transparent transition duration-150 cursor-default"
+    class="gantt-bar absolute flex text-sm border ring-0 ring-transparent transition duration-150 cursor-default rounded-[10px]"
     :class="{
       'opacity-40': isDragging || isResizing,
       'cursor-grab': !isDragging && !bar.isLocked,
       'cursor-grabbing': isDragging && !bar.isLocked,
       [GANTT_TASK_STYLE.get(bar.status)!]: true,
       'ring-2 ring-blue-500 ring-offset-1': isLinkTarget,
+      'py-3 px-4': currentBar.days >= 2,
+      'p-1': currentBar.days === 1,
     }"
     :style="{
       left: currentBar.x + 'px',
@@ -106,18 +109,31 @@ const onLinkHandleDown = (e: MouseEvent) => {
     @mouseleave="hoveredBarId = null"
   >
     <div
-      class="gantt-link-handle absolute -right-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 border-blue-500 cursor-crosshair opacity-0 group-hover:opacity-100 transition-opacity z-20"
+      class="gantt-link-handle absolute -right-2 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 border-blue-500 cursor-crosshair opacity-0 group-hover:opacity-100 transition-opacity z-20"
       @mousedown.stop="onLinkHandleDown"
     />
-    <div class="w-full flex items-center px-2 relative">
+    <div
+      class="w-full flex justify-between items-center px-2 relative"
+      :class="{
+        'flex-col gap-0': currentBar.days === 1,
+      }"
+    >
       <div
-        class="gantt-bar-resizer absolute h-full w-2 bg-transparent left-0"
+        class="gantt-bar-resizer absolute h-full w-2 bg-transparent z-99 left-0"
         :class="bar.isLocked ? 'cursor-default' : 'cursor-col-resize'"
         @mousedown.stop="onResizeMouseDown"
       />
-      {{ currentBar.name }}
+      <p class="flex items-center gap-2 font-jost text-sm text-white">
+        <span class="text-[20px] font-montserrat font-bold">#{{ currentBar.id }}</span>
+        {{ currentBar.name }}
+      </p>
       <div
-        class="gantt-bar-resizer absolute h-full w-2 bg-transparent right-0 cursor-col-resize"
+        class="rounded-[20px] bg-dark-blue text-blue px-2.5 py-1 font-bold font-jost text-sm h-min"
+      >
+        {{ GANTT_TASK_TEXT.get(currentBar.status) }}
+      </div>
+      <div
+        class="gantt-bar-resizer absolute h-full w-2 bg-transparent right-0 z-99 cursor-col-resize"
         @mousedown.stop="startRight"
       />
     </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, provide, ref, toRef } from 'vue';
-import { GanttBody, GanttHeader, GanttSidebar } from '.';
+import { GanttBody, GanttFooter, GanttHeader, GanttSidebar } from '.';
 import {
     addDays,
     MONTH_NAMES,
@@ -89,20 +89,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="rounded-xl border border-gray-400 bg-white flex overflow-hidden"
-    style="height: 600px"
-  >
-    <GanttSidebar />
+  <div class="flex flex-col w-full h-screen">
+    <div class="border flex overflow-hidden">
+      <GanttSidebar />
 
-    <section
-      ref="scrollContainer"
-      class="flex-1 flex flex-col overflow-auto [overflow-anchor:none]"
-      :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
-      @mousedown="onPanStart"
-    >
-      <GanttHeader :months="months" />
-      <GanttBody :months="months" />
-    </section>
+      <section
+        ref="scrollContainer"
+        class="flex-1 flex flex-col overflow-auto [overflow-anchor:none]"
+        :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
+        @mousedown="onPanStart"
+      >
+        <GanttHeader :months="months" />
+        <GanttBody :months="months" />
+      </section>
+    </div>
+    <GanttFooter />
   </div>
 </template>

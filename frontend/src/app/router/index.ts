@@ -25,6 +25,7 @@ const router = createRouter({
             path: Routes.gantt.path,
             name: Routes.gantt.name,
             component: () => import('@/pages/gantt/GanttTestPage.vue'),
+            meta: { layout: 'empty' },
         },
         {
             path: Routes.register.path,
