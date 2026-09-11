@@ -15,6 +15,7 @@ class ProjectResource extends JsonResource
     public function toArray(Request $request): array
     {
         $owner = $this->owner()->first();
+        $responsible = $this->responsible()->first();
 
         return [
             'id' => $this->id,
@@ -24,6 +25,7 @@ class ProjectResource extends JsonResource
             'status' => $this->status,
             'owner' => $owner ? new UserResource($owner) : null,
             'members' => UserResource::collection($this->members),
+            'responsible' => $responsible ? new UserResource($responsible) : null,
         ];
     }
 }

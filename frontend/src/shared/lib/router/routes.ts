@@ -11,6 +11,10 @@ export const Routes = {
         path: '/auth/login',
         name: 'login',
     },
+    gantt: {
+        path: '/gantt',
+        name: 'gantt',
+    },
     register: {
         path: '/auth/register',
         name: 'register',

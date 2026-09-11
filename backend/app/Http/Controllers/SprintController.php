@@ -63,8 +63,8 @@ class SprintController extends Controller
         $sprint->delete();
 
         return response()->json([
-            'message' => 'Sprint deleted successfully',
-        ]);
+
+        ], 204);
     }
 
     private function authorizeProject(Project $project): void

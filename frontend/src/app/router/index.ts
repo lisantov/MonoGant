@@ -22,6 +22,11 @@ const router = createRouter({
             component: () => import('@/pages/login/LoginPage.vue'),
         },
         {
+            path: Routes.gantt.path,
+            name: Routes.gantt.name,
+            component: () => import('@/pages/gantt/GanttTestPage.vue'),
+        },
+        {
             path: Routes.register.path,
             name: Routes.register.name,
             component: () => import('@/pages/register/RegisterPage.vue'),

@@ -3,9 +3,12 @@
 namespace App\Http\Requests\Task;
 
 use App\Enums\StatusEnum;
+use App\Models\Sprint;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -24,10 +27,34 @@ class StoreTaskRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'started_at' => ['nullable', 'date'],
-            'deadline_at' => ['nullable', 'date'],
+            'started_at' => ['required', 'date'],
+            'deadline_at' => ['required', 'date', 'after_or_equal:started_at'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
             'user_email' => ['nullable', 'email', 'exists:users,email'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->has('started_at') || $validator->errors()->has('deadline_at')) {
+                return;
+            }
+
+            $sprint = $this->route('sprint');
+
+            if (! $sprint instanceof Sprint) {
+                return;
+            }
+
+            $conflict = $sprint->dateRangeConflict(
+                Carbon::parse($this->input('started_at')),
+                Carbon::parse($this->input('deadline_at')),
+            );
+
+            if ($conflict !== null) {
+                $validator->errors()->add('deadline_at', $conflict);
+            }
+        });
     }
 }
