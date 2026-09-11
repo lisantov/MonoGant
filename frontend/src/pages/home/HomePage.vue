@@ -99,10 +99,6 @@
           </ul>
         </div>
       </div>
-      <modal-task
-        :sprint-id="1"
-        :user-options="[]"
-      />
     </div>
   </section>
 </template>
