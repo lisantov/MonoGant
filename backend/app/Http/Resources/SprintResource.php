@@ -18,10 +18,13 @@ class SprintResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'started_at' => $this->started_at() ? $this->started_at()->toDateString() : null,
-            'deadline_at' => $this->started_at() ? $this->deadline_at()->toDateString() : null,
+            'deadline_at' => $this->deadline_at() ? $this->deadline_at()->toDateString() : null,
             'status' => $this->status,
             'description' => $this->description,
             'next_sprint_id' => $this->next_sprint_id,
+            'completed_tasks_count' => $this->completedTasksCount(),
+            'total_tasks_count' => $this->totalTasksCount(),
+            'completion_percentage' => $this->completionPercentage(),
         ];
     }
 }

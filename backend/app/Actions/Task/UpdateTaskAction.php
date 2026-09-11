@@ -46,6 +46,8 @@ class UpdateTaskAction
                 RescheduleAction::run($task);
             }
 
+            $task->sprint->project->extendDeadlineTo($task->sprint->deadline_at());
+
             return $task->fresh();
         });
     }

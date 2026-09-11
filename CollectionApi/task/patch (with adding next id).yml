@@ -5,7 +5,13 @@ info:
 
 http:
   method: PATCH
-  url: "{{host}}{{prefix}}/tasks/2"
+  url: "{{host}}{{prefix}}/tasks/4"
+  body:
+    type: json
+    data: |-
+      {
+        "next_task_id": 5
+      }
   auth: inherit
 
 settings:

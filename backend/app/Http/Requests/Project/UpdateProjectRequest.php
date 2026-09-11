@@ -5,7 +5,9 @@ namespace App\Http\Requests\Project;
 use App\Enums\StatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateProjectRequest extends FormRequest
 {
@@ -30,5 +32,26 @@ class UpdateProjectRequest extends FormRequest
             'deadline_at' => ['date'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->has('started_at') || $validator->errors()->has('deadline_at')) {
+                return;
+            }
+
+            $existing = $this->route('project');
+            $startedAt = $this->input('started_at', $existing?->started_at);
+            $deadlineAt = $this->input('deadline_at', $existing?->deadline_at);
+
+            if ($startedAt === null || $deadlineAt === null) {
+                return;
+            }
+
+            if (Carbon::parse($deadlineAt)->lt(Carbon::parse($startedAt))) {
+                $validator->errors()->add('deadline_at', 'The project deadline must be on or after the start date.');
+            }
+        });
     }
 }
