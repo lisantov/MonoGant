@@ -99,13 +99,12 @@
           </ul>
         </div>
       </div>
-      <AppMiniModal />
     </div>
   </section>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { AppButton, AppMiniModal } from '@/shared';
+import { AppButton } from '@/shared';
 
 const router = useRouter();
 </script>
