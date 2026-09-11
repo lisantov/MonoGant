@@ -1,6 +1,7 @@
 import { defineQuery, defineMutation, useQuery, useMutation, useQueryCache } from '@pinia/colada';
 import { useAuth } from '@/shared/composables';
 import { accountService, ACCOUNT_QUERY_KEYS } from '@/entities';
+import router from '@/app/router';
 
 export const useProfile = defineQuery(() => {
     const { isAuth } = useAuth();
@@ -21,6 +22,7 @@ export const useLogin = defineMutation(() => {
         onSuccess(data) {
             setToken(data.token);
             queryCache.invalidateQueries({ key: ACCOUNT_QUERY_KEYS.all() });
+            router.push('/main');
         },
     });
 });
@@ -34,6 +36,7 @@ export const useRegister = defineMutation(() => {
         onSuccess(data) {
             setToken(data.token);
             queryCache.invalidateQueries({ key: ACCOUNT_QUERY_KEYS.all() });
+            router.push('/main');
         },
     });
 });
