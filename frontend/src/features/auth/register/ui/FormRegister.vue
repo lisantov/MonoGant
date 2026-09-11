@@ -2,25 +2,29 @@
 import { useForm } from 'vee-validate';
 import { registerSchema } from '@/features';
 import { AppButton, AppInput, AppLink } from '@/shared';
+import { useRegister } from '@/entities';
 
-const { defineField, errors } = useForm({
+const { defineField, handleSubmit, errors } = useForm({
     validationSchema: registerSchema,
 });
 
-// const { mutateAsync, isLoading } = useRegister()
+const { mutateAsync } = useRegister();
 
 const [name, nameAttrs] = defineField('name');
 const [email, emailAttrs] = defineField('email');
 const [password, passwordAttrs] = defineField('password');
 const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 
-// const onSubmit = handleSubmit((values) => {
-//   mutateAsync(values)
-// })
+const onSubmit = handleSubmit((values) => {
+    mutateAsync(values);
+});
 </script>
 
 <template>
-  <form class="flex w-full h-full flex-col justify-between items-center py-[120px] px-[90px]">
+  <form
+    class="flex w-full h-full flex-col justify-between items-center py-[120px] px-[90px]"
+    @submit.prevent="onSubmit"
+  >
     <h2 class="text-[60px] text-white font-jost font-semibold text-center">
       Создание аккаунта
     </h2>
@@ -53,7 +57,9 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
       />
     </div>
     <div class="flex flex-col w-full justify-center gap-[15px]">
-      <app-button> Создать аккаунт </app-button>
+      <app-button type="submit">
+        Создать аккаунт
+      </app-button>
       <p class="text-white font-montserrat font-normal text-[18px] text-center">
         У вас есть аккаунт?
         <AppLink to="login">

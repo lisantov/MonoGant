@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { AppButton, AppIcon, SwitchProject } from '@/shared';
+import { useLogout, useProfile } from '@/entities';
 
 interface Props {
     name: string;
@@ -58,6 +59,13 @@ const projectsData: Props[] = [
         status: 'in_progress',
     },
 ];
+
+const { data: profile } = useProfile();
+const { mutateAsync } = useLogout();
+
+const onSubmit = () => {
+    mutateAsync();
+};
 </script>
 
 <template>
@@ -99,6 +107,7 @@ const projectsData: Props[] = [
       <div class="flex justify-end">
         <div
           class="min-w-10 min-h-10 text-white cursor-pointer flex justify-center rounded-xl p-2 bg-gray border border-light-gray items-center"
+          @click="onSubmit"
         >
           <app-icon name="exit" />
         </div>
@@ -107,7 +116,9 @@ const projectsData: Props[] = [
         <app-icon name="avatar" />
         <div class="flex flex-col gap-4 text-white w-full text-2xl">
           <div class="flex w-full items-center justify-between">
-            <p>Анатолий Рудской</p>
+            <p>
+              {{ profile?.user.name }}
+            </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
             >
@@ -115,7 +126,9 @@ const projectsData: Props[] = [
             </div>
           </div>
           <div class="flex w-full items-center justify-between">
-            <p>anatolya@gmail.com</p>
+            <p>
+              {{ profile?.user.email }}
+            </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
             >

@@ -1,11 +1,9 @@
 export interface Account {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    createdAt: string;
-    updatedAt: string;
+    user: {
+        name: string;
+        email: string;
+    };
+    projects: [];
 }
 
 export interface LoginBody {
@@ -21,6 +19,5 @@ export interface LoginResponse {
 export interface RegisterBody {
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
+    name: string;
 }
