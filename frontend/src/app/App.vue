@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterView, useRoute } from 'vue-router';
 import { DefaultLayout, EmptyLayout } from './layouts';
-
 import { Notivue, NotivueSwipe, Notification } from 'notivue';
 import { computed } from 'vue';
 
