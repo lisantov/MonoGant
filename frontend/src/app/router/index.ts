@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { Routes } from '@/shared/lib';
-import { ProtectedRoutes } from '@/shared/lib/router/routes';
+import { GuestRoutes, ProtectedRoutes } from '@/shared/lib/router/routes';
 import { useAuth } from '@/shared';
 
 const router = createRouter({
@@ -28,6 +28,11 @@ const router = createRouter({
             meta: { layout: 'empty' },
         },
         {
+            path: Routes.ganttById.path,
+            name: Routes.ganttById.name,
+            component: () => import('@/pages/gantt/GanttTestPage.vue'),
+        },
+        {
             path: Routes.register.path,
             name: Routes.register.name,
             component: () => import('@/pages/register/RegisterPage.vue'),
@@ -41,8 +46,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-    if (ProtectedRoutes.includes(to.path) && !useAuth().isAuth.value)
-        router.push(Routes.login.name);
+    const { isAuth } = useAuth();
+    if (ProtectedRoutes.includes(to.path) && !isAuth.value) router.push(Routes.login.name);
+    else if (GuestRoutes.includes(to.path) && isAuth.value) router.push(Routes.main.path);
 });
 
 export default router;

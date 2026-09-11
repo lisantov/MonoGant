@@ -1,2 +1,2 @@
 export { ACCOUNT_QUERY_KEYS } from './account.keys';
-export { useProfile, useLogin, useRegister, useLogout, useUpdateProfile } from './account.queries';
+export { useProfile, useLogin, useRegister, useLogout } from './account.queries';

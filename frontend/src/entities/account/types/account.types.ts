@@ -1,9 +1,8 @@
-export interface Account {
-    user: {
-        name: string;
-        email: string;
-    };
-    projects: [];
+import type { Project } from '@/entities/project/types/project.types';
+
+export interface User {
+    name: string;
+    email: string;
 }
 
 export interface LoginBody {
@@ -11,13 +10,18 @@ export interface LoginBody {
     password: string;
 }
 
-export interface LoginResponse {
-    token: string;
-    user: Account;
-}
-
 export interface RegisterBody {
+    name: string;
     email: string;
     password: string;
-    name: string;
+}
+
+export interface AuthResponse {
+    token: string;
+    user: User;
+}
+
+export interface ProfileResponse {
+    user: User;
+    projects: Project[];
 }

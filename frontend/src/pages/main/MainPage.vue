@@ -1,71 +1,82 @@
 <script setup lang="ts">
-import { AppButton, AppIcon, SwitchProject } from '@/shared';
-import { useLogout, useProfile } from '@/entities';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { push } from 'notivue';
+import { AppButton, AppIcon, SwitchProject, AppModal, AppMiniModal, useModal } from '@/shared';
+import { Routes } from '@/shared/lib';
+import { useProjects, useDeleteProject, useLogout, type Project } from '@/entities';
+import { FormCreateProject, FormEditProject } from '@/features';
 
-interface Props {
-    name: string;
-    participants: string | number;
-    owner: string;
-    responsible: string;
-    createDate: string;
-    endDate: string;
-    status: 'planned' | 'in_progress' | 'done' | 'cancelled';
-}
+const { data: projects, isLoading } = useProjects();
+const { mutateAsync: deleteProject } = useDeleteProject();
+const { mutateAsync: logout } = useLogout();
 
-const projectsData: Props[] = [
-    {
-        name: 'ArcheCode',
-        participants: 13,
-        owner: 'Олегов А.',
-        responsible: 'Петров Б.',
-        createDate: '01.01.2001',
-        endDate: '01.01.2001',
-        status: 'done',
-    },
-    {
-        name: 'DataFlow',
-        participants: 8,
-        owner: 'Сидоров В.',
-        responsible: 'Иванов Г.',
-        createDate: '15.03.2024',
-        endDate: '30.09.2024',
-        status: 'in_progress',
-    },
-    {
-        name: 'CloudSync',
-        participants: 5,
-        owner: 'Кузнецов Д.',
-        responsible: 'Смирнов Е.',
-        createDate: '10.06.2025',
-        endDate: '15.12.2025',
-        status: 'planned',
-    },
-    {
-        name: 'NeuroNet',
-        participants: 21,
-        owner: 'Волков Ж.',
-        responsible: 'Новиков З.',
-        createDate: '05.01.2023',
-        endDate: '20.08.2023',
-        status: 'cancelled',
-    },
-    {
-        name: 'SecureVault',
-        participants: 12,
-        owner: 'Морозов И.',
-        responsible: 'Павлов К.',
-        createDate: '22.11.2024',
-        endDate: '01.06.2025',
-        status: 'in_progress',
-    },
-];
+const { openModal, closeModal } = useModal();
+const router = useRouter();
 
-const { data: profile } = useProfile();
-const { mutateAsync } = useLogout();
+const editingProject = ref<Project | null>(null);
+const deletingProject = ref<Project | null>(null);
 
-const onSubmit = () => {
-    mutateAsync();
+const switchProjects = computed(() =>
+    (projects.value?.data ?? []).map((project) => ({
+        id: project.id,
+        name: project.name,
+        participants: project.members.length,
+        owner: project.owner?.name ?? '—',
+        responsible: '—',
+        createDate: project.started_at,
+        endDate: project.deadline_at,
+        status: project.status as 'planned' | 'in_progress' | 'done' | 'cancelled',
+    }))
+);
+
+const findProject = (id: number): Project | null =>
+    projects.value?.data?.find((project) => project.id === id) ?? null;
+
+const openCreateProject = () => openModal('projectCreate');
+
+const openEditProject = (id: number) => {
+    const project = findProject(id);
+    if (!project) return;
+    editingProject.value = project;
+    openModal('projectEdit');
 };
+
+const openDeleteProject = (id: number) => {
+    const project = findProject(id);
+    if (!project) return;
+    deletingProject.value = project;
+    openModal('projectDelete');
+};
+
+const openProject = (id: number) => {
+    router.push({ name: Routes.ganttById.name, params: { id } });
+};
+
+const onProjectCreated = () => {
+    push.success('Проект создан');
+    closeModal();
+};
+
+const onProjectUpdated = () => {
+    push.success('Проект обновлён');
+    closeModal();
+};
+
+const onDeleteConfirm = async () => {
+    if (!deletingProject.value) return;
+    await deleteProject(deletingProject.value.id);
+    deletingProject.value = null;
+    closeModal();
+    push.success('Проект удалён');
+};
+
+const handleLogout = async () => {
+    await logout();
+    router.push(Routes.login);
+};
+
+const onNotAvailable = (message: string) => push.info(message);
 </script>
 
 <template>
@@ -74,6 +85,7 @@ const onSubmit = () => {
       <div class="flex items-start">
         <div
           class="flex bg-gray p-5 gap-4 justify-start items-center text-accent-base rounded-[20px] hover:opacity-80 cursor-pointer"
+          @click="openCreateProject"
         >
           <div class="drop-shadow-[0_0_6px_rgba(0,185,6,0.75)]">
             <app-icon name="plus" />
@@ -84,10 +96,25 @@ const onSubmit = () => {
         </div>
       </div>
       <div class="bg-gray p-7 rounded-3xl max-h-[92vh] flex flex-col">
-        <div class="projects-scroll flex flex-col gap-4 overflow-y-auto">
+        <div
+          v-if="isLoading"
+          class="flex flex-col items-center justify-center py-16 text-white"
+        >
+          <p>Загрузка проектов...</p>
+        </div>
+        <div
+          v-else-if="switchProjects.length === 0"
+          class="flex flex-col items-center justify-center py-16 text-white"
+        >
+          <p>Проектов пока нет</p>
+        </div>
+        <div
+          v-else
+          class="projects-scroll flex flex-col gap-4 overflow-y-auto"
+        >
           <div
-            v-for="(project, index) in projectsData"
-            :key="index"
+            v-for="project in switchProjects"
+            :key="project.id"
           >
             <switch-project
               :name="project.name"
@@ -97,6 +124,9 @@ const onSubmit = () => {
               :create-date="project.createDate"
               :end-date="project.endDate"
               :status="project.status"
+              @open="openProject(project.id)"
+              @edit="openEditProject(project.id)"
+              @delete="openDeleteProject(project.id)"
             />
           </div>
         </div>
@@ -107,7 +137,7 @@ const onSubmit = () => {
       <div class="flex justify-end">
         <div
           class="min-w-10 min-h-10 text-white cursor-pointer flex justify-center rounded-xl p-2 bg-gray border border-light-gray items-center"
-          @click="onSubmit"
+          @click="openModal('mini')"
         >
           <app-icon name="exit" />
         </div>
@@ -121,6 +151,7 @@ const onSubmit = () => {
             </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
+              @click="onNotAvailable('Редактирование профиля недоступно')"
             >
               <app-icon name="edit" />
             </div>
@@ -131,17 +162,69 @@ const onSubmit = () => {
             </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
+              @click="onNotAvailable('Редактирование профиля недоступно')"
             >
               <app-icon name="edit" />
             </div>
           </div>
         </div>
-        <app-button variant-button="solid">
+        <app-button
+          variant-button="solid"
+          @click="onNotAvailable('Смена пароля недоступна')"
+        >
           Сменить пароль
         </app-button>
       </div>
     </div>
   </div>
+
+  <app-modal name="projectCreate">
+    <div class="flex flex-col gap-4 bg-gray p-8 rounded-[20px] w-[420px] text-white">
+      <h2 class="text-2xl font-jost">
+        Создать проект
+      </h2>
+      <form-create-project @created="onProjectCreated" />
+    </div>
+  </app-modal>
+
+  <app-modal name="projectEdit">
+    <div class="flex flex-col gap-4 bg-gray p-8 rounded-[20px] w-[420px] text-white">
+      <h2 class="text-2xl font-jost">
+        Редактировать проект
+      </h2>
+      <form-edit-project
+        v-if="editingProject"
+        :project="editingProject"
+        @updated="onProjectUpdated"
+      />
+    </div>
+  </app-modal>
+
+  <app-modal name="projectDelete">
+    <div
+      class="flex flex-col gap-6 bg-gray p-8 rounded-[20px] w-[380px] text-white items-center"
+    >
+      <p class="text-lg">
+        Удалить проект «{{ deletingProject?.name ?? '' }}»?
+      </p>
+      <div class="flex gap-4 justify-center">
+        <app-button
+          variant-button="solid"
+          @click="closeModal"
+        >
+          Отмена
+        </app-button>
+        <app-button
+          variant-button="danger"
+          @click="onDeleteConfirm"
+        >
+          Удалить
+        </app-button>
+      </div>
+    </div>
+  </app-modal>
+
+  <app-mini-modal @confirm="handleLogout" />
 </template>
 
 <style scoped lang="scss">

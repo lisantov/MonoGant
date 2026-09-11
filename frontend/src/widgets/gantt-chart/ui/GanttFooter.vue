@@ -10,22 +10,22 @@ const completedTasks = computed(
 </script>
 
 <template>
-  <div class="w-full px-8 py-10 flex justify-between bg-dark-gray border-t border-white/6">
-    <p class="font-jost text-md text-dark-blue-gray">
-      Всего задач: {{ sprints?.allTasks.value.length ?? 0 }} &bull; Выполнено:
-      {{ completedTasks }} &bull; Не выполнено:
-      {{ (sprints?.allTasks.value.length ?? 0) - (completedTasks ?? 0) }} &bull; Команда: 3
-      человека
-    </p>
-    <div class="w-min whitespace-nowrap">
-      <app-button
-        variant-button="accent"
-        size="md"
-        class="flex justify-center items-center gap-3 text-[16px] font-jost font-normal"
-      >
-        <app-icon name="team" />
-        Настроить команду
-      </app-button>
+    <div class="w-full px-8 py-10 flex justify-between bg-dark-gray border-t border-white/6">
+        <p class="font-jost text-md text-dark-blue-gray">
+            Всего задач: {{ sprints?.allTasks.value.length ?? 0 }} &bull; Выполнено:
+            {{ completedTasks }} &bull; Не выполнено:
+            {{ (sprints?.allTasks.value.length ?? 0) - (completedTasks ?? 0) }} &bull; Команда: 3
+            человека
+        </p>
+        <div class="w-min whitespace-nowrap">
+            <app-button
+                variant-button="accent"
+                size="md"
+                class="flex justify-center items-center gap-3 text-[16px] font-jost font-normal"
+            >
+                <app-icon name="team" />
+                Настроить команду
+            </app-button>
+        </div>
     </div>
-  </div>
 </template>

@@ -35,47 +35,44 @@ const checkType = computed<string>(() => {
 </script>
 
 <template>
-  <div class="flex flex-col transition-all duration-500">
-    <transition
-      name="errorShow"
-      class="text-error pl-5 text-xs transition duration-500 pb-2"
-    >
-      <p v-if="error">
-        {{ error }}
-      </p>
-    </transition>
-    <label
-      class="label justify-center items-center"
-      :class="inputVariants({ error: !!error, disabled, size })"
-    >
-      <input
-        v-model="model"
-        :type="checkType"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        class="w-full outline-none"
-        :required="required"
-      >
-      <span class="flex justify-center w-6 h-6">
-        <template v-if="type === 'password'">
-          <template v-if="check === true">
-            <app-icon
-              name="password-open"
-              class="cursor-pointer text-primary-dark hover:opacity-70 transition-opacity duration-300 w-6 h-6"
-              @click="checkPassword"
+    <div class="flex flex-col transition-all duration-500">
+        <transition name="errorShow" class="text-error pl-5 text-xs transition duration-500 pb-2">
+            <p v-if="error">
+                {{ error }}
+            </p>
+        </transition>
+        <label
+            class="label justify-center items-center"
+            :class="inputVariants({ error: !!error, disabled, size })"
+        >
+            <input
+                v-model="model"
+                :type="checkType"
+                :placeholder="placeholder"
+                :disabled="disabled"
+                class="w-full outline-none"
+                :required="required"
             />
-          </template>
-          <template v-else>
-            <app-icon
-              name="password-lock"
-              class="cursor-pointer text-primary-dark hover:opacity-70 transition-opacity duration-300"
-              @click="checkPassword"
-            />
-          </template>
-        </template>
-      </span>
-    </label>
-  </div>
+            <span class="flex justify-center w-6 h-6">
+                <template v-if="type === 'password'">
+                    <template v-if="check === true">
+                        <app-icon
+                            name="password-open"
+                            class="cursor-pointer text-primary-dark hover:opacity-70 transition-opacity duration-300 w-6 h-6"
+                            @click="checkPassword"
+                        />
+                    </template>
+                    <template v-else>
+                        <app-icon
+                            name="password-lock"
+                            class="cursor-pointer text-primary-dark hover:opacity-70 transition-opacity duration-300"
+                            @click="checkPassword"
+                        />
+                    </template>
+                </template>
+            </span>
+        </label>
+    </div>
 </template>
 
 <style lang="scss" scoped>

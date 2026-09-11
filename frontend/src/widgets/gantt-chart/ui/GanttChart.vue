@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, provide, ref, toRef } from 'vue';
+import { computed, nextTick, onMounted, provide, ref, toRef } from 'vue';
 import { GanttBody, GanttFooter, GanttHeader, GanttSidebar } from '.';
 import {
     addDays,
@@ -17,6 +17,8 @@ import {
 interface IProps {
     sprints?: IGanttSprint[];
     config?: IGanttConfig;
+    projectId?: number;
+    members?: Array<{ name: string; email: string }>;
 }
 const props = defineProps<IProps>();
 
@@ -78,7 +80,9 @@ onMounted(() => {
     const el = scrollContainer.value;
     if (!el) return;
 
-    const first = sprintsSource.allTasks.value[0];
+    nextTick();
+
+    const first = sprintsSource.allTasks.value.find((t) => !!t);
     if (!first) {
         el.scrollTo({ left: 0 });
         return;
@@ -89,20 +93,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full h-screen">
-    <div class="border flex overflow-hidden">
-      <GanttSidebar />
+    <div class="flex flex-col w-full h-screen">
+        <div class="border flex overflow-hidden h-full">
+            <GanttSidebar :project-id="projectId" :members="members" />
 
-      <section
-        ref="scrollContainer"
-        class="flex-1 flex flex-col overflow-auto [overflow-anchor:none]"
-        :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
-        @mousedown="onPanStart"
-      >
-        <GanttHeader :months="months" />
-        <GanttBody :months="months" />
-      </section>
+            <section
+                ref="scrollContainer"
+                class="flex-1 flex flex-col overflow-auto [overflow-anchor:none]"
+                :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
+                @mousedown="onPanStart"
+            >
+                <GanttHeader :months="months" />
+                <GanttBody :months="months" />
+            </section>
+        </div>
+        <GanttFooter />
     </div>
-    <GanttFooter />
-  </div>
 </template>
