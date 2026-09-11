@@ -25,7 +25,9 @@ class CreateTaskAction
 
         $this->resolveAssignee($data, $sprint->project);
 
-        return Task::create([...$data, 'sprint_id' => $sprint->id]);
+        $task = Task::create([...$data, 'sprint_id' => $sprint->id]);
+
+        return $task;
     }
 
     private function resolveAssignee(array &$data, Project $project): void

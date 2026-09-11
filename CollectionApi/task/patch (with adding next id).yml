@@ -1,0 +1,16 @@
+info:
+  name: patch (with adding next id)
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{host}}{{prefix}}/tasks/2"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
