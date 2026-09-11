@@ -28,7 +28,7 @@ class StoreSprintRequest extends FormRequest
                 'max:255',
                 Rule::unique('sprints', 'name')->where(fn ($query) => $query->where('project_id', $this->route('project')->id)),
             ],
-            'description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:255', 'min:0'],
             'status' => ['nullable', Rule::enum(StatusEnum::class)],
         ];
     }

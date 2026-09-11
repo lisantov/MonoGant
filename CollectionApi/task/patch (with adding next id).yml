@@ -1,17 +1,16 @@
 info:
-  name: patch
+  name: patch (with adding next id)
   type: http
-  seq: 4
+  seq: 6
 
 http:
   method: PATCH
-  url: "{{host}}{{prefix}}/tasks/1"
+  url: "{{host}}{{prefix}}/tasks/4"
   body:
     type: json
     data: |-
       {
-        "name": "task2",
-        "next_task_id": 2
+        "next_task_id": 5
       }
   auth: inherit
 

@@ -146,7 +146,9 @@ const onNotAvailable = (message: string) => push.info(message);
         <app-icon name="avatar" />
         <div class="flex flex-col gap-4 text-white w-full text-2xl">
           <div class="flex w-full items-center justify-between">
-            <p>Анатолий Рудской</p>
+            <p>
+              {{ profile?.user.name }}
+            </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
               @click="onNotAvailable('Редактирование профиля недоступно')"
@@ -155,7 +157,9 @@ const onNotAvailable = (message: string) => push.info(message);
             </div>
           </div>
           <div class="flex w-full items-center justify-between">
-            <p>anatolya@gmail.com</p>
+            <p>
+              {{ profile?.user.email }}
+            </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
               @click="onNotAvailable('Редактирование профиля недоступно')"

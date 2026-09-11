@@ -1,17 +1,18 @@
 info:
-  name: login
+  name: patch (just fields)
   type: http
-  seq: 2
+  seq: 4
 
 http:
-  method: POST
-  url: "{{host}}{{prefix}}/login"
+  method: PATCH
+  url: "{{host}}{{prefix}}/tasks/2"
   body:
     type: json
     data: |-
       {
-        "email": "email0@email.com",
-        "password": "QWEasd123!!!"
+        "name": "task2",
+        "started_at": "2026-09-18",
+        "deadline_at": "2026-09-20"
       }
   auth: inherit
 

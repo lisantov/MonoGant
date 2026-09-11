@@ -4,6 +4,7 @@ import { AppButton, AppInput, AppLink, Routes } from '@/shared';
 import { useLogin } from '@/entities';
 import { useForm } from 'vee-validate';
 import { loginSchema } from '@/features';
+import { useLogin } from '@/entities';
 
 const router = useRouter();
 

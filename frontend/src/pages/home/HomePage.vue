@@ -1,13 +1,7 @@
 <template>
   <section class="relative w-full overflow-x-hidden text-white">
-    <div class="flex mx-auto min-h-screen max-w-6xl items-center gap-20">
+    <div class="flex mx-auto contentBlock max-w-6xl items-center gap-20">
       <div class="space-y-12">
-        <app-button
-          variant-button="solid"
-          @click="openModal('taskApp')"
-        >
-          Модалка
-        </app-button>
         <h1
           class="text-5xl leading-tight font-extrabold tracking-tight md:text-6xl lg:text-7xl xl:text-8xl"
         >
@@ -21,7 +15,10 @@
         </p>
 
         <div class="flex items-center gap-6">
-          <app-button @click="router.push('/auth/login')">
+          <app-button
+            variant-button="accent"
+            @click="router.push('/auth/login')"
+          >
             Войти в аккаунт
           </app-button>
           <app-button
@@ -106,15 +103,17 @@
         :sprint-id="1"
         :user-options="[]"
       />
-      <AppMiniModal />
     </div>
   </section>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { AppButton, AppMiniModal, useModal } from '@/shared';
-import ModalTask from '@/widgets/modals/ui/modalTask.vue';
-const { openModal } = useModal();
+import { AppButton } from '@/shared';
 
 const router = useRouter();
 </script>
+<style scoped>
+.contentBlock {
+    height: calc(100vh - 100px);
+}
+</style>

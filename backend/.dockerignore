@@ -1,0 +1,15 @@
+.editorconfig
+.claude
+.idea
+.zed
+.agents
+.env.example
+.gitattributes
+.gitignore
+.mcp.json
+.npmrc
+AGENTS.md
+boost.json
+CLAUDE.md
+phpunit.xml
+README.md
