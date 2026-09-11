@@ -41,6 +41,7 @@ const onSubmit = handleSubmit((values) => {
         />
         <app-input
           v-model="password"
+          type="password"
           placeholder="Пароль"
           :error="errors.password"
           v-bind="passwordAttrs"
@@ -50,6 +51,7 @@ const onSubmit = handleSubmit((values) => {
         <app-button
           type="submit"
           :disabled="!!Object.keys(errors).length || isLoading"
+          variant-button="accent"
         >
           Войти
         </app-button>
