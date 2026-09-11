@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, inject, provide, ref, onBeforeUnmount, reactive } from 'vue';
+import { useUpdateTask } from '@/entities';
 import { GanttBar } from '.';
 import {
     buildDependencyPath,
@@ -25,6 +26,8 @@ defineProps<IProps>();
 const timescale = inject(TIMESCALE_KEY)!;
 const sprintsSource = inject(SPRINTS_KEY)!;
 
+const { mutateAsync: updateTask } = useUpdateTask();
+
 const hoveredBarId = ref<number | null>(null);
 provide(GANTT_UI_KEY, { hoveredBarId });
 
@@ -35,7 +38,10 @@ const dayStart = (d: Date) => {
     x.setHours(0, 0, 0, 0);
     return x;
 };
-const dayDiff = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
+const dayDiff = (a: Date, b: Date) => {
+    const result = Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
+    return result;
+};
 
 /** Раскладка спринтов: x, y, width, height */
 const sprintLayouts = computed<IGanttSprintBar[]>(() => {
@@ -208,6 +214,25 @@ const linkingFrom = ref<number | null>(null);
 const hoveredTargetId = ref<number | null>(null);
 const cursor = reactive({ x: 0, y: 0 });
 
+const nextTaskBefore = new Map<number, number | null>();
+
+const snapshotNextTaskIds = () => {
+    nextTaskBefore.clear();
+    for (const s of sprintsSource.sprints.value) {
+        for (const t of s.tasks) nextTaskBefore.set(t.id, t.next_task_id ?? null);
+    }
+};
+
+const syncLinkChanges = () => {
+    for (const s of sprintsSource.sprints.value) {
+        for (const t of s.tasks) {
+            const next = t.next_task_id ?? null;
+            if (nextTaskBefore.get(t.id) === next) continue;
+            updateTask({ id: t.id, data: { next_task_id: next } }).catch(() => {});
+        }
+    }
+};
+
 const toLocal = (e: MouseEvent) => {
     const r = chartRef.value!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -249,7 +274,11 @@ const onMouseMove = (e: MouseEvent) => {
 const onMouseUp = () => {
     if (linkingFrom.value != null && hoveredTargetId.value != null) {
         const res = sprintsSource.linkTasks(linkingFrom.value, hoveredTargetId.value);
-        if (!res.ok) console.warn('[gantt] link:', res.error);
+        if (!res.ok) {
+            console.warn('[gantt] link:', res.error);
+        } else {
+            syncLinkChanges();
+        }
     }
     stopLink();
 };
@@ -265,6 +294,7 @@ const stopLink = () => {
 
 const startLink = (barId: number, e: MouseEvent) => {
     e.preventDefault();
+    snapshotNextTaskIds();
     linkingFrom.value = barId;
     hoveredTargetId.value = null;
     const p = toLocal(e);
@@ -306,104 +336,117 @@ const linkPreviewPath = computed(() => {
 </script>
 
 <template>
-    <div class="flex w-full relative h-full">
-        <!-- сетка -->
-        <div class="absolute inset-0 flex">
-            <div
-                v-for="month in months"
-                :key="`${month.year}-${month.monthIndex}`"
-                class="flex not-last:border-r border-white/32 bg-gray"
-            >
-                <div
-                    v-for="day in month.days"
-                    :key="`${month.year}-${month.monthIndex}-${day}`"
-                    class="flex justify-center items-center not-last:border-r border-white/6 relative"
-                    :style="{ width: timescale.dayWidth.value + 'px' }"
-                >
-                    <div
-                        v-if="isItToday(month, day)"
-                        class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 z-999 opacity-20"
-                    />
-                </div>
-            </div>
+  <div class="flex w-full relative h-full">
+    <div class="absolute inset-0 flex">
+      <div
+        v-for="month in months"
+        :key="`${month.year}-${month.monthIndex}`"
+        class="flex not-last:border-r border-white/32 bg-gray"
+      >
+        <div
+          v-for="day in month.days"
+          :key="`${month.year}-${month.monthIndex}-${day}`"
+          class="flex justify-center items-center not-last:border-r border-white/6 relative"
+          :style="{ width: timescale.dayWidth.value + 'px' }"
+        >
+          <div
+            v-if="isItToday(month, day)"
+            class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 z-999 opacity-20"
+          />
         </div>
-
-        <div ref="chartRef" class="relative">
-            <div
-                v-for="sprint in sprintLayouts"
-                :key="`sprint-${sprint.id}`"
-                class="absolute top-0 bottom-0 rounded-lg border-2 border-dashed pointer-events-none p-3.75"
-                :style="{
-                    left: sprint.x + 'px',
-                    width: sprint.days * timescale.dayWidth.value + 'px',
-                    borderColor: sprint.color.border,
-                    backgroundColor: sprint.color.bg,
-                }"
-            >
-                <div
-                    class="w-min flex items-center justify-center whitespace-nowrap gap-2 px-3 py-2 font-jost font-regular text-md text-input-placeholder bg-input-placeholder-hover/10 border border-input-placeholder-hover/20 rounded-[10px]"
-                >
-                    <div class="rounded-full bg-input-placeholder w-2 aspect-square" />
-                    {{ sprint.name }}
-                </div>
-            </div>
-
-            <!-- бары задач -->
-            <GanttBar v-for="(bar, i) in bars" :key="bar.id ?? i" :bar="bar" />
-
-            <!-- стрелки-связи -->
-            <svg
-                class="absolute inset-0 z-10"
-                :width="totalWidth"
-                :height="totalHeight"
-                style="pointer-events: none"
-            >
-                <defs>
-                    <marker
-                        id="arrowhead"
-                        viewBox="0 0 10 10"
-                        refX="9"
-                        refY="5"
-                        markerWidth="6"
-                        markerHeight="6"
-                        orient="auto-start-reverse"
-                    >
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#56ae63" />
-                    </marker>
-                    <marker
-                        id="arrowhead-active"
-                        viewBox="0 0 10 10"
-                        refX="9"
-                        refY="5"
-                        markerWidth="6"
-                        markerHeight="6"
-                        orient="auto-start-reverse"
-                    >
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#55f05b" />
-                    </marker>
-                </defs>
-
-                <path
-                    v-for="link in links"
-                    :key="link.id"
-                    :d="link.d"
-                    class="gantt-link"
-                    :class="{ 'gantt-link--active': isLinkActive(link) }"
-                    fill="none"
-                    stroke-linejoin="round"
-                    :marker-end="isLinkActive(link) ? 'url(#arrowhead-active)' : 'url(#arrowhead)'"
-                />
-                <path
-                    v-if="linkPreviewPath"
-                    :d="linkPreviewPath"
-                    class="gantt-link gantt-link--preview"
-                    fill="none"
-                    stroke-linejoin="round"
-                    marker-end="url(#arrowhead-active)"
-                />
-            </svg>
-        </div>
+      </div>
     </div>
+
+    <div
+      ref="chartRef"
+      class="relative"
+    >
+      <div
+        v-for="sprint in sprintLayouts"
+        :key="`sprint-${sprint.id}`"
+        class="absolute top-0 bottom-0 rounded-lg border-2 border-dashed pointer-events-none p-3.75"
+        :style="{
+          left: sprint.x + 'px',
+          width: sprint.days * timescale.dayWidth.value + 'px',
+          borderColor: sprint.color.border,
+          backgroundColor: sprint.color.bg,
+        }"
+      >
+        {{ sprint.days }}
+        <div
+          class="w-min flex items-center justify-center whitespace-nowrap gap-2 px-3 py-2 font-jost font-regular text-md text-input-placeholder bg-input-placeholder-hover/10 border border-input-placeholder-hover/20 rounded-[10px]"
+        >
+          <div class="rounded-full bg-input-placeholder w-2 aspect-square" />
+          {{ sprint.name }}
+        </div>
+      </div>
+
+      <!-- бары задач -->
+      <GanttBar
+        v-for="(bar, i) in bars"
+        :key="bar.id ?? i"
+        :bar="bar"
+      />
+
+      <!-- стрелки-связи -->
+      <svg
+        class="absolute inset-0 z-10"
+        :width="totalWidth"
+        :height="totalHeight"
+        style="pointer-events: none"
+      >
+        <defs>
+          <marker
+            id="arrowhead"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M 0 0 L 10 5 L 0 10 z"
+              fill="#56ae63"
+            />
+          </marker>
+          <marker
+            id="arrowhead-active"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M 0 0 L 10 5 L 0 10 z"
+              fill="#55f05b"
+            />
+          </marker>
+        </defs>
+
+        <path
+          v-for="link in links"
+          :key="link.id"
+          :d="link.d"
+          class="gantt-link"
+          :class="{ 'gantt-link--active': isLinkActive(link) }"
+          fill="none"
+          stroke-linejoin="round"
+          :marker-end="isLinkActive(link) ? 'url(#arrowhead-active)' : 'url(#arrowhead)'"
+        />
+        <path
+          v-if="linkPreviewPath"
+          :d="linkPreviewPath"
+          class="gantt-link gantt-link--preview"
+          fill="none"
+          stroke-linejoin="round"
+          marker-end="url(#arrowhead-active)"
+        />
+      </svg>
+    </div>
+  </div>
 </template>
 
 <style scoped>
