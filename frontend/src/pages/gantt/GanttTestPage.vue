@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useProjects, useParseProject } from '@/entities';
+import { useProjects, useParseProject, useProfile } from '@/entities';
 import { GanttChart, type IGanttSprint, type IGanttTask } from '@/widgets';
 
 const route = useRoute();
 
 const { data: projects, isLoading: projectsLoading } = useProjects();
+const { data: profile } = useProfile();
 
 const projectIdFromParam = computed<number | undefined>(() => {
     const raw = route.params.id;
@@ -19,6 +20,12 @@ const activeProjectId = computed<number | undefined>(
     () => projectIdFromParam.value ?? projects.value?.data?.[0]?.id
 );
 
+const isOwner = computed<boolean>(
+    () =>
+        !!profile.value?.user.email &&
+        profile.value.user.email === parsed.value?.project.owner?.email
+);
+
 const { data: parsed } = useParseProject(activeProjectId);
 
 const sprints = computed<IGanttSprint[]>(() =>
@@ -27,6 +34,7 @@ const sprints = computed<IGanttSprint[]>(() =>
         name: s.name,
         description: s.description ?? '',
         status: s.status,
+        completion_percentage: s.completion_percentage,
         tasks: s.tasks.map((t): IGanttTask => ({
             id: t.id,
             name: t.name,
@@ -59,6 +67,7 @@ const sprints = computed<IGanttSprint[]>(() =>
       :sprints="sprints"
       :project-id="activeProjectId"
       :members="parsed?.project?.members ?? []"
+      :is-owner="isOwner"
     />
   </div>
 </template>

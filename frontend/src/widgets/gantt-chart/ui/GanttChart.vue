@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, provide, ref, toRef, watch } from 'vue';
 import { GanttBody, GanttFooter, GanttHeader, GanttSidebar } from '.';
+import { ModalTaskDetail } from '../../modals';
+import { useTaskDetail } from '../../modals/lib/use-task-detail';
 import {
     addDays,
     MONTH_NAMES,
@@ -19,8 +21,15 @@ interface IProps {
     config?: IGanttConfig;
     projectId?: number;
     members?: Array<{ name: string; email: string }>;
+    isOwner?: boolean;
 }
-const props = defineProps<IProps>();
+const props = withDefaults(defineProps<IProps>(), {
+    sprints: undefined,
+    config: undefined,
+    projectId: undefined,
+    members: () => [],
+    isOwner: false,
+});
 
 const scrollContainer = ref<HTMLElement | null>(null);
 
@@ -31,6 +40,8 @@ const timescale = useTimeScale(props.config, () => sprintsSource.allTasks.value.
 
 provide(SPRINTS_KEY, sprintsSource);
 provide(TIMESCALE_KEY, timescale);
+
+const { selection } = useTaskDetail();
 
 const months = computed<IMonth[]>(() => {
     const tasks = sprintsSource.allTasks.value.map((x) => x.task);
@@ -107,5 +118,11 @@ const unwatch = watch(sprintsSource.allTasks, (newValue) => {
       </section>
     </div>
     <GanttFooter />
+    <ModalTaskDetail
+      v-if="selection?.taskId"
+      :project-id="projectId"
+      :members="members"
+      :is-owner="isOwner"
+    />
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { AppButton, AppInput } from '@/shared';
 import { useCreateSprint, type Sprint } from '@/entities';
 import { sprintCreateSchema } from '../lib/validation';
 
@@ -33,22 +34,22 @@ const onSubmit = handleSubmit(async (values) => {
 
 <template>
   <form
-    class="flex flex-col gap-2"
+    class="flex flex-col gap-4"
     @submit.prevent="onSubmit"
   >
-    <input
+    <app-input
       v-model="name"
       type="text"
       placeholder="Название спринта"
-      class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+      :error="errors.name"
       v-bind="nameAttrs"
-    >
-    <button
+    />
+    <app-button
       type="submit"
-      class="rounded bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 disabled:opacity-50"
       :disabled="isLoading || !!Object.keys(errors).length"
+      variant-button="accent"
     >
-      + Добавить спринт
-    </button>
+      Добавить спринт
+    </app-button>
   </form>
 </template>

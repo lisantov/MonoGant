@@ -10,10 +10,11 @@ export const useTasksBySprint = (sprintId: MaybeRefOrGetter<number | null>) =>
         enabled: () => toValue(sprintId) != null,
     });
 
-export const useTask = (taskId: MaybeRefOrGetter<number>) =>
+export const useTask = (taskId: MaybeRefOrGetter<number | null>) =>
     useQuery({
-        key: () => TASK_QUERY_KEYS.byId(toValue(taskId)),
-        query: () => taskService.show(toValue(taskId)),
+        key: () => TASK_QUERY_KEYS.byId(toValue(taskId)!),
+        query: () => taskService.show(toValue(taskId)!),
+        enabled: () => toValue(taskId) != null,
     });
 
 export const useCreateTask = defineMutation(() => {

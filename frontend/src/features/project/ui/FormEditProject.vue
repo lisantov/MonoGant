@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { AppButton, GANTT_TASK_STATUS } from '@/shared';
+import { AppButton, AppInput, GANTT_TASK_STATUS } from '@/shared';
 import { useUpdateProject, type Project } from '@/entities';
 import { projectEditSchema } from '../lib/validation';
 
@@ -32,6 +32,13 @@ const { mutateAsync, isLoading } = useUpdateProject();
 
 const statusOptions = Object.values(GANTT_TASK_STATUS);
 
+const statusLabels: Record<GANTT_TASK_STATUS, string> = {
+    [GANTT_TASK_STATUS.PLANNED]: 'Запланирован',
+    [GANTT_TASK_STATUS.IN_PROGRESS]: 'В процессе',
+    [GANTT_TASK_STATUS.DONE]: 'Завершён',
+    [GANTT_TASK_STATUS.CANCELLED]: 'Отменён',
+};
+
 const onSubmit = handleSubmit(async (values) => {
     const updated = await mutateAsync({
         id: props.project.id,
@@ -51,59 +58,47 @@ const onSubmit = handleSubmit(async (values) => {
     class="flex flex-col gap-4"
     @submit.prevent="onSubmit"
   >
-    <div class="flex flex-col gap-1">
-      <input
-        v-model="name"
-        type="text"
-        placeholder="Название проекта"
-        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
-        v-bind="nameAttrs"
-      >
-      <p class="text-xs text-error">
-        {{ errors.name }}
-      </p>
-    </div>
-    <div class="flex flex-col gap-1">
-      <input
-        v-model="started_at"
-        type="date"
-        placeholder="Дата начала"
-        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
-        v-bind="startedAtAttrs"
-      >
-      <p class="text-xs text-error">
-        {{ errors.started_at }}
-      </p>
-    </div>
-    <div class="flex flex-col gap-1">
-      <input
-        v-model="deadline_at"
-        type="date"
-        placeholder="Дата окончания"
-        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
-        v-bind="deadlineAtAttrs"
-      >
-      <p class="text-xs text-error">
-        {{ errors.deadline_at }}
-      </p>
-    </div>
-    <div class="flex flex-col gap-1">
+    <app-input
+      v-model="name"
+      type="text"
+      placeholder="Название проекта"
+      :error="errors.name"
+      v-bind="nameAttrs"
+    />
+    <app-input
+      v-model="started_at"
+      type="date"
+      placeholder="Дата начала"
+      :error="errors.started_at"
+      v-bind="startedAtAttrs"
+    />
+    <app-input
+      v-model="deadline_at"
+      type="date"
+      placeholder="Дата окончания"
+      :error="errors.deadline_at"
+      v-bind="deadlineAtAttrs"
+    />
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-montserrat text-input-placeholder"> Статус </span>
       <select
         v-model="status"
-        class="border border-gray-300 rounded px-2 py-1 text-sm bg-white outline-none"
+        class="bg-dark-gray font-montserrat text-white leading-none rounded-2xl border-2 border-input-outline px-5 py-4 outline-none transition duration-300 hover:bg-white/5 focus:border-accent-base"
       >
         <option
           v-for="option in statusOptions"
           :key="option"
           :value="option"
+          class="bg-dark-gray text-white"
         >
-          {{ option }}
+          {{ statusLabels[option] }}
         </option>
       </select>
-    </div>
+    </label>
     <app-button
       type="submit"
       :disabled="isLoading || !!Object.keys(errors).length"
+      variant-button="accent"
     >
       Сохранить
     </app-button>

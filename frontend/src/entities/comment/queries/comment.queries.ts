@@ -3,10 +3,11 @@ import { defineMutation, useMutation, useQuery, useQueryCache } from '@pinia/col
 import { commentService, COMMENT_QUERY_KEYS } from '@/entities';
 import type { StoreCommentBody } from '@/entities/comment/types/comment.types';
 
-export const useComments = (taskId: MaybeRefOrGetter<number>) =>
+export const useComments = (taskId: MaybeRefOrGetter<number | null>) =>
     useQuery({
-        key: () => COMMENT_QUERY_KEYS.byTask(toValue(taskId)),
-        query: () => commentService.list(toValue(taskId)),
+        key: () => COMMENT_QUERY_KEYS.byTask(toValue(taskId)!),
+        query: () => commentService.list(toValue(taskId)!),
+        enabled: () => toValue(taskId) != null,
     });
 
 export const useComment = (id: MaybeRefOrGetter<number>) =>

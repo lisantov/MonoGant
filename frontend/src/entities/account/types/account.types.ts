@@ -21,6 +21,11 @@ export interface ChangePasswordBody {
     new_password: string;
 }
 
+export interface UpdateUserBody {
+    name?: string;
+    email?: string;
+}
+
 export interface AuthResponse {
     token: string;
     user: User;

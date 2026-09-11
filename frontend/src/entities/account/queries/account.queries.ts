@@ -64,3 +64,14 @@ export const useChangePassword = defineMutation(() =>
         mutation: accountService.changePassword,
     })
 );
+
+export const useUpdateProfile = defineMutation(() => {
+    const queryCache = useQueryCache();
+
+    return useMutation({
+        mutation: accountService.updateProfile,
+        onSuccess() {
+            queryCache.invalidateQueries({ key: ACCOUNT_QUERY_KEYS.all() });
+        },
+    });
+});

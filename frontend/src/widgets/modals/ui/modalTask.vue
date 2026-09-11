@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FormCreateTask } from '@/features';
-import { AppModal } from '@/shared';
+import { AppModal, useModal } from '@/shared';
 
 interface IProps {
     sprintId: number;
@@ -13,6 +13,9 @@ withDefaults(defineProps<IProps>(), {
     userOptions: () => [],
     projectId: undefined,
 });
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { closeModal } = useModal();
 </script>
 
 <template>

@@ -79,6 +79,7 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
                 name: name.trim() || `Спринт ${newId}`,
                 description: '',
                 status: GANTT_TASK_STATUS.PLANNED,
+                completion_percentage: 0,
                 tasks: [],
             },
         ];
@@ -99,7 +100,7 @@ export const useGanttSprints = (source: MaybeRefOrGetter<IGanttSprint[] | undefi
                 `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
             // ── если спринт пуст — начинаем со дня после последнего спринта ──
-            let defaultStart;
+            let defaultStart = tomorrow;
             if (s.tasks.length === 0) {
                 // ищем самый поздний deadline_at среди задач ДРУГИХ спринтов
                 let latest: Date | null = null;

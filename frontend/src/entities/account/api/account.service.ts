@@ -5,6 +5,7 @@ import type {
     LoginBody,
     ProfileResponse,
     RegisterBody,
+    UpdateUserBody,
 } from '@/entities';
 
 export const accountService = {
@@ -19,4 +20,6 @@ export const accountService = {
 
     changePassword: (data: ChangePasswordBody) =>
         api.post('change-password', data).then((res) => res.data),
+
+    updateProfile: (data: UpdateUserBody) => api.patch('user', data).then((res) => res.data),
 };

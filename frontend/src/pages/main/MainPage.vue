@@ -5,7 +5,12 @@ import { push } from 'notivue';
 import { AppButton, AppIcon, SwitchProject, AppModal, AppMiniModal, useModal } from '@/shared';
 import { Routes } from '@/shared/lib';
 import { useProjects, useDeleteProject, useLogout, type Project, useProfile } from '@/entities';
-import { FormCreateProject, FormEditProject, FormChangePassword } from '@/features';
+import {
+    FormCreateProject,
+    FormEditProject,
+    FormChangePassword,
+    FormEditProfile,
+} from '@/features';
 
 const { data: profile } = useProfile();
 const { data: projects, isLoading } = useProjects();
@@ -76,8 +81,6 @@ const handleLogout = async () => {
     await logout();
     router.push(Routes.login);
 };
-
-const onNotAvailable = (message: string) => push.info(message);
 </script>
 
 <template>
@@ -85,13 +88,15 @@ const onNotAvailable = (message: string) => push.info(message);
     <div class="col-span-8 flex flex-col gap-4">
       <div class="flex items-start">
         <div
-          class="flex bg-gray p-5 gap-4 justify-start items-center text-accent-base rounded-[20px] hover:opacity-80 cursor-pointer"
+          class="flex bg-gray p-5 gap-4 justify-start items-center text-accent-base rounded-[20px] hover:opacity-80 cursor-pointer transition duration-250"
           @click="openCreateProject"
         >
           <div class="drop-shadow-[0_0_6px_rgba(0,185,6,0.75)]">
             <app-icon name="plus" />
           </div>
-          <p class="drop-shadow-[0_0_6px_rgba(0,185,6,0.75)]">
+          <p
+            class="font-montserrat font-medium text-xl drop-shadow-[0_0_6px_rgba(0,185,6,0.75)]"
+          >
             Создать проект
           </p>
         </div>
@@ -105,7 +110,7 @@ const onNotAvailable = (message: string) => push.info(message);
         </div>
         <div
           v-else-if="switchProjects.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-white"
+          class="flex flex-col font-jost text-xl items-center justify-center py-16 text-white"
         >
           <p>Проектов пока нет</p>
         </div>
@@ -152,7 +157,7 @@ const onNotAvailable = (message: string) => push.info(message);
             </p>
             <div
               class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
-              @click="onNotAvailable('Редактирование профиля недоступно')"
+              @click="openModal('profileEdit')"
             >
               <app-icon name="edit" />
             </div>
@@ -161,12 +166,6 @@ const onNotAvailable = (message: string) => push.info(message);
             <p>
               {{ profile?.user.email }}
             </p>
-            <div
-              class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray items-center"
-              @click="onNotAvailable('Редактирование профиля недоступно')"
-            >
-              <app-icon name="edit" />
-            </div>
           </div>
         </div>
         <app-button
@@ -231,6 +230,19 @@ const onNotAvailable = (message: string) => push.info(message);
         Сменить пароль
       </h2>
       <form-change-password />
+    </div>
+  </app-modal>
+
+  <app-modal name="profileEdit">
+    <div class="flex flex-col gap-4 bg-gray p-8 rounded-[20px] w-[420px] text-white">
+      <h2 class="text-2xl font-jost">
+        Редактировать профиль
+      </h2>
+      <form-edit-profile
+        v-if="profile"
+        :user-name="profile.user.name"
+        :user-email="profile.user.email"
+      />
     </div>
   </app-modal>
 

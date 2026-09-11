@@ -7,6 +7,7 @@ import { useModal } from '@/shared';
 import { PROJECT_QUERY_KEYS, useCreateSprint } from '@/entities';
 import type { User } from '@/entities';
 import ModalTask from '../../modals/ui/modalTask.vue';
+import { useTaskDetail } from '../../modals/lib/use-task-detail';
 
 interface IProps {
     projectId?: number;
@@ -27,6 +28,7 @@ const activeTaskSprint = ref<{ id: number; name: string } | null>(null);
 const { mutateAsync: createSprintMutation } = useCreateSprint();
 const queryCache = useQueryCache();
 const { openModal } = useModal();
+const { openTaskDetail } = useTaskDetail();
 
 const toggle = (id: number) => (collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id));
 
@@ -101,6 +103,16 @@ const openTaskModal = (sprint: { id: number; name: string }) => {
               </svg>
               <span class="truncate">{{ sprint.name }}</span>
               <span class="text-[10px] pb-3 text-gray-400">({{ sprint.tasks.length }})</span>
+              <span
+                class="text-[10px] pb-3 font-semibold"
+                :class="
+                  sprint.completion_percentage >= 100
+                    ? 'text-accent-base'
+                    : 'text-gray-400'
+                "
+              >
+                · {{ sprint.completion_percentage }}%
+              </span>
             </button>
 
             <button
@@ -119,7 +131,8 @@ const openTaskModal = (sprint: { id: number; name: string }) => {
             <li
               v-for="task in sprint.tasks"
               :key="task.id"
-              class="px-2 py-1 text-md flex flex-col gap-0.5 font-jost"
+              class="px-2 py-1 text-md flex flex-col gap-0.5 font-jost cursor-pointer hover:bg-white/5 rounded transition duration-200"
+              @click="openTaskDetail({ taskId: task.id, sprintName: sprint.name })"
             >
               <span class="truncate text-white">{{ task.name }}</span>
               <span class="text-[12px] text-dark-blue-gray">

@@ -50,6 +50,7 @@ export interface IGanttSprint {
     name: string;
     description: string;
     status: GANTT_TASK_STATUS;
+    completion_percentage: number;
     tasks: IGanttTask[];
 }
 
@@ -77,6 +78,7 @@ export interface IGanttSprintBar {
     headerHeight: number;
     color: ISprintColor;
     status: GANTT_TASK_STATUS;
+    completion_percentage: number;
 }
 
 export const MS_PER_DAY = 1000 * 60 * 60 * 24;

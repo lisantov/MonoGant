@@ -84,6 +84,7 @@ const sprintLayouts = computed<IGanttSprintBar[]>(() => {
             height: chartHeight, // ← все на всю высоту
             headerHeight: HEADER_HEIGHT,
             status: sprint.status,
+            completion_percentage: sprint.completion_percentage,
             color: getSprintColor(index),
         });
     }
@@ -377,6 +378,16 @@ const linkPreviewPath = computed(() => {
         >
           <div class="rounded-full bg-input-placeholder w-2 aspect-square" />
           {{ sprint.name }}
+          <span
+            class="text-[12px] font-semibold px-1.5 py-0.5 rounded-full"
+            :class="
+              sprint.completion_percentage >= 100
+                ? 'bg-accent-dark/30 text-accent-base'
+                : 'bg-white/10 text-input-placeholder'
+            "
+          >
+            {{ sprint.completion_percentage }}%
+          </span>
         </div>
       </div>
 

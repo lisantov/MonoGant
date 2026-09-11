@@ -8,6 +8,9 @@ export interface Sprint {
     status: GANTT_TASK_STATUS;
     description: string | null;
     next_sprint_id: number | null;
+    completed_tasks_count: number;
+    total_tasks_count: number;
+    completion_percentage: number;
 }
 
 export interface StoreSprintBody {
