@@ -13,4 +13,4 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 
 EXPOSE 80
 
-CMD ["sh", "-c", "php artisan storage:link --force || true; php artisan migrate --force; apache2-foreground"]
+CMD ["sh", "-c", "rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf; a2enmod mpm_prefork rewrite >/dev/null 2>&1 || true; php artisan storage:link --force || true; php artisan migrate --force; exec apache2-foreground"]
