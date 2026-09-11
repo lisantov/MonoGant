@@ -58,3 +58,9 @@ export const useLogout = defineMutation(() => {
         },
     });
 });
+
+export const useChangePassword = defineMutation(() =>
+    useMutation({
+        mutation: accountService.changePassword,
+    })
+);

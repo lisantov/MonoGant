@@ -127,7 +127,6 @@ const onLinkHandleDown = (e: MouseEvent) => {
     @mouseenter="hoveredBarId = currentBar.id"
     @mouseleave="hoveredBarId = null"
   >
-    {{ bar.days }}
     <div
       class="gantt-link-handle absolute -right-2 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border-2 border-blue-500 cursor-crosshair opacity-0 group-hover:opacity-100 transition-opacity z-20"
       @mousedown.stop="onLinkHandleDown"
