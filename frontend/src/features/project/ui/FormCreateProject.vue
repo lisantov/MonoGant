@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { AppButton } from '@/shared';
+import { AppButton, AppInput } from '@/shared';
 import { useCreateProject, type Project } from '@/entities';
-import { projectCreateSchema } from '../lib/validation';
+import { projectCreateSchema } from '@/features';
 
 const emit = defineEmits<{
     created: [project: Project];
@@ -34,37 +34,34 @@ const onSubmit = handleSubmit(async (values) => {
     @submit.prevent="onSubmit"
   >
     <div class="flex flex-col gap-1">
-      <input
+      <app-input
         v-model="name"
         type="text"
         placeholder="Название проекта"
-        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
         v-bind="nameAttrs"
-      >
+      />
       <p class="text-xs text-error">
         {{ errors.name }}
       </p>
     </div>
     <div class="flex flex-col gap-1">
-      <input
+      <app-input
         v-model="started_at"
         type="date"
         placeholder="Дата начала"
-        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
         v-bind="startedAtAttrs"
-      >
+      />
       <p class="text-xs text-error">
         {{ errors.started_at }}
       </p>
     </div>
     <div class="flex flex-col gap-1">
-      <input
+      <app-input
         v-model="deadline_at"
         type="date"
         placeholder="Дата окончания"
-        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
         v-bind="deadlineAtAttrs"
-      >
+      />
       <p class="text-xs text-error">
         {{ errors.deadline_at }}
       </p>
@@ -72,6 +69,7 @@ const onSubmit = handleSubmit(async (values) => {
     <app-button
       type="submit"
       :disabled="isLoading || !!Object.keys(errors).length"
+      variant-button="accent"
     >
       Создать проект
     </app-button>
