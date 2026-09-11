@@ -26,6 +26,9 @@ class ProjectResource extends JsonResource
             'owner' => $owner ? new UserResource($owner) : null,
             'members' => UserResource::collection($this->members),
             'responsible' => $responsible ? new UserResource($responsible) : null,
+            'completed_tasks_count' => $this->completedTasksCount(),
+            'total_tasks_count' => $this->totalTasksCount(),
+            'completion_percentage' => $this->completionPercentage(),
         ];
     }
 }

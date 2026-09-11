@@ -190,7 +190,7 @@ const onNotAvailable = (message: string) => push.info(message);
 
   <app-modal name="projectEdit">
     <div class="flex flex-col gap-4 bg-gray p-8 rounded-[20px] w-[420px] text-white">
-      <h2 class="text-2xl font-jost">
+      <h2 class="text-2xl font-montserrat">
         Редактировать проект
       </h2>
       <form-edit-project
@@ -205,7 +205,7 @@ const onNotAvailable = (message: string) => push.info(message);
     <div
       class="flex flex-col gap-6 bg-gray p-8 rounded-[20px] w-[380px] text-white items-center"
     >
-      <p class="text-lg">
+      <p class="text-xl font-montserrat">
         Удалить проект «{{ deletingProject?.name ?? '' }}»?
       </p>
       <div class="flex gap-4 justify-center">
