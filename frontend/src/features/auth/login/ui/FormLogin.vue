@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AppButton, AppInput } from '@/shared';
+import { AppButton, AppInput, AppLink } from '@/shared';
 import { useForm } from 'vee-validate';
 import { loginSchema } from '@/features';
 
@@ -16,28 +16,32 @@ const [password, passwordAttrs] = defineField('password');
 </script>
 
 <template>
-  <form class="linear-border flex flex-col gap-15">
-    <h2 class="text-[32px] text-center">
-      Логин
+  <form class="flex w-full h-full flex-col justify-between items-center py-[120px] px-[90px]">
+    <h2 class="text-[60px] text-white font-jost font-semibold text-center">
+      Вход в аккаунт
     </h2>
-    <div class="flex flex-col gap-20 justify-center">
-      <div class="flex flex-col gap-5">
-        <app-input
-          v-model="login"
-          placeholder="Логин"
-          :error="errors.login"
-          v-bind="loginAttrs"
-        />
-        <app-input
-          v-model="password"
-          placeholder="Пароль"
-          :error="errors.password"
-          v-bind="passwordAttrs"
-        />
-      </div>
-      <div class="flex flex-col gap-5">
-        <app-button>Войти</app-button>
-      </div>
+    <div class="flex w-full flex-col justify-center gap-10">
+      <app-input
+        v-model="login"
+        placeholder="Логин"
+        :error="errors.login"
+        v-bind="loginAttrs"
+      />
+      <app-input
+        v-model="password"
+        placeholder="Пароль"
+        :error="errors.password"
+        v-bind="passwordAttrs"
+      />
+    </div>
+    <div class="flex flex-col w-full justify-center gap-[15px]">
+      <app-button> Войти </app-button>
+      <p class="text-white font-montserrat font-normal text-[18px] text-center">
+        У вас нет аккаунта?
+        <AppLink to="register">
+          Зарегистрироваться
+        </AppLink>
+      </p>
     </div>
   </form>
 </template>
