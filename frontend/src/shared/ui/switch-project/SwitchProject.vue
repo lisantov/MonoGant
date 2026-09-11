@@ -33,7 +33,7 @@ const translateStatus = (status: Props['status']): string => {
 
 <template>
   <div
-    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white cursor-pointer"
+    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white cursor-pointer transition-all duration-300 hover:scale-97"
     @click="emit('open')"
   >
     <div class="flex w-full justify-between items-center">
