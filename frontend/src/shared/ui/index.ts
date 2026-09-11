@@ -5,3 +5,4 @@ export * from './background';
 export * from './switch-project';
 export * from './link';
 export * from './modal';
+export * from './textarea';

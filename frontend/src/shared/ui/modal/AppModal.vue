@@ -7,7 +7,7 @@
       >
         <div
           ref="modalEl"
-          class="h-fit"
+          class="h-fit max-w-[75%] mmax-h-[80% overflow-y-auto]"
         >
           <slot />
         </div>

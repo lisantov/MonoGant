@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-type Modal = 'mini';
+type Modal = 'mini' | 'taskDetails';
 
 const currentModal = ref<Modal | null>(null);
 

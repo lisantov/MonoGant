@@ -4,7 +4,7 @@
       <div class="space-y-12">
         <app-button
           variant-button="solid"
-          @click="openModal('mini')"
+          @click="openModal('taskDetails')"
         >
           Модалка
         </app-button>
@@ -102,13 +102,14 @@
           </ul>
         </div>
       </div>
-      <AppMiniModal />
+      <TaskDetailsModal :id="1" />
     </div>
   </section>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { AppButton, AppMiniModal, useModal } from '@/shared';
+import { AppButton, useModal } from '@/shared';
+import { TaskDetailsModal } from '@/widgets';
 const { openModal } = useModal();
 
 const router = useRouter();
