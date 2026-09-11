@@ -1,137 +1,69 @@
 <template>
   <AppModal name="EditTeam">
-    <div>
-      <p>Редактирование команды проекта <span>(45)</span></p>
-      <div>
-        <label
-          for=""
-          @click="closeModal"
-        >
-          <input type="text">
-        </label>
-        <app-icon name="arrow-down" />
-      </div>
-      <div
-        v-for="(data, index) in participantsData"
-        :key="index"
+    <div class="flex flex-col items-center bg-gray gap-8 p-8 rounded-xl min-w-200">
+      <p
+        class="font-montserrat text-2xl text-accent-light drop-shadow-[0_0_6px_rgba(0,185,6,0.75)]"
       >
-        <p>{{ data.name }}</p>
-        <p>{{ data.email }}</p>
+        Редактирование команды проекта
+        <span>(Участников: {{ props.members!.length }})</span>
+      </p>
+      <div
+        class="flex w-full projects-scroll flex-col gap-4 overflow-y-auto max-h-150 text-white"
+      >
+        <div
+          v-for="(data, index) in members"
+          :key="index"
+          class="flex w-full p-4 bg-dark-gray rounded-2xl justify-between items-center"
+        >
+          <p>{{ data.name }}</p>
+          <p>{{ data.email }}</p>
+          <div class="flex gap-2 items-center">
+            <div
+              class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray border border-light-gray items-center"
+            >
+              <app-icon
+                name="trashcan"
+                class="text-error"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </AppModal>
 </template>
 
 <script setup lang="ts">
-import { AppIcon, AppModal, useModal } from '@/shared';
+import { AppIcon, AppModal } from '@/shared';
 
-const { closeModal } = useModal();
-interface Participant {
-    name: string;
-    email: string;
-    role: 'ответственный' | 'участник' | 'владелец' | 'наблюдатель';
+interface IProps {
+    members?: Array<{ name: string; email: string }>;
 }
 
-const participantsData: Participant[] = [
-    {
-        name: 'Алергик Конь',
-        email: 'anatolya@gmail.com',
-        role: 'ответственный',
-    },
-    {
-        name: 'Иван Петров',
-        email: 'ivan.petrov@mail.ru',
-        role: 'владелец',
-    },
-    {
-        name: 'Мария Сидорова',
-        email: 'maria.s@yandex.ru',
-        role: 'участник',
-    },
-    {
-        name: 'Алексей Волков',
-        email: 'volkov.a@gmail.com',
-        role: 'участник',
-    },
-    {
-        name: 'Елена Новикова',
-        email: 'elena.n@outlook.com',
-        role: 'наблюдатель',
-    },
-    {
-        name: 'Дмитрий Козлов',
-        email: 'd.kozlov@mail.ru',
-        role: 'ответственный',
-    },
-    {
-        name: 'Анна Морозова',
-        email: 'anna.morozova@gmail.com',
-        role: 'участник',
-    },
-    {
-        name: 'Сергей Павлов',
-        email: 's.pavlov@yandex.ru',
-        role: 'владелец',
-    },
-    {
-        name: 'Ольга Соколова',
-        email: 'olga.sokolova@mail.ru',
-        role: 'участник',
-    },
-    {
-        name: 'Андрей Лебедев',
-        email: 'lebedev.a@gmail.com',
-        role: 'наблюдатель',
-    },
-    {
-        name: 'Татьяна Кузнецова',
-        email: 't.kuznetsova@outlook.com',
-        role: 'ответственный',
-    },
-    {
-        name: 'Николай Попов',
-        email: 'popov.n@mail.ru',
-        role: 'участник',
-    },
-    {
-        name: 'Екатерина Васильева',
-        email: 'ekaterina.v@gmail.com',
-        role: 'участник',
-    },
-    {
-        name: 'Михаил Зайцев',
-        email: 'zaycev.m@yandex.ru',
-        role: 'владелец',
-    },
-    {
-        name: 'Наталья Орлова',
-        email: 'orlova.n@gmail.com',
-        role: 'наблюдатель',
-    },
-    {
-        name: 'Владимир Семёнов',
-        email: 'v.semenov@mail.ru',
-        role: 'ответственный',
-    },
-    {
-        name: 'Ирина Голубева',
-        email: 'irina.g@outlook.com',
-        role: 'участник',
-    },
-    {
-        name: 'Александр Виноградов',
-        email: 'vinogradov.a@gmail.com',
-        role: 'участник',
-    },
-    {
-        name: 'Светлана Богданова',
-        email: 'bogdanova.s@yandex.ru',
-        role: 'наблюдатель',
-    },
-    {
-        name: 'Павел Воробьёв',
-        email: 'vorobyov.p@mail.ru',
-        role: 'ответственный',
-    },
-];
+const props = defineProps<IProps>();
 </script>
+
+<style scoped lang="scss">
+.projects-scroll {
+    padding: 5px 10px 5px 6px;
+
+    &::-webkit-scrollbar {
+        width: 30px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #242424;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border: 10px solid transparent;
+        background-color: var(--accent-light);
+        border-radius: 10px;
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-light) #242424;
+}
+</style>

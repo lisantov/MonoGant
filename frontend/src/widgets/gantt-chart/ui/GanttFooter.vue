@@ -1,14 +1,22 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 import { GANTT_TASK_STATUS, SPRINTS_KEY } from '../lib';
-import { AppButton, AppIcon, Routes } from '@/shared';
+import { AppButton, AppIcon, Routes, useModal } from '@/shared';
 import { useRouter } from 'vue-router';
+import { EditTeamModal } from '@/widgets/modals/edit-team';
+
+interface IProps {
+    members?: Array<{ name: string; email: string }>;
+}
+const props = defineProps<IProps>();
 
 const sprints = inject(SPRINTS_KEY);
 const completedTasks = computed(
     () => sprints?.allTasks.value.filter((i) => i.task.status === GANTT_TASK_STATUS.DONE).length
 );
 const router = useRouter();
+
+const { openModal } = useModal();
 </script>
 
 <template>
@@ -33,10 +41,12 @@ const router = useRouter();
         variant-button="accent"
         size="md"
         class="flex justify-center items-center gap-3 text-[16px] font-jost font-normal"
+        @click="openModal('EditTeam')"
       >
         <app-icon name="team" />
         Настроить команду
       </app-button>
     </div>
+    <EditTeamModal :members="props.members" />
   </div>
 </template>

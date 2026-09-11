@@ -106,6 +106,6 @@ const unwatch = watch(sprintsSource.allTasks, (newValue) => {
         <GanttBody :months="months" />
       </section>
     </div>
-    <GanttFooter />
+    <GanttFooter :members="members" />
   </div>
 </template>
