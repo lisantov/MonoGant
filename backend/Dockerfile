@@ -11,4 +11,4 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "php artisan storage:link --force || true; php artisan migrate --force; exec php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-c", "php artisan storage:link --force || true; php artisan migrate --force; exec php -S 0.0.0.0:8000 -t public"]
