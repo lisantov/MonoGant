@@ -29,7 +29,7 @@ const editProject = () => {};
 
 <template>
   <div
-    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white"
+    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white transition-all duration-300 hover:scale-97 cursor-pointer"
   >
     <div class="flex w-full justify-between items-center">
       <p class="text-[28px]">
