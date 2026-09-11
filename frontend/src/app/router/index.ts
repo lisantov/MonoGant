@@ -15,6 +15,7 @@ const router = createRouter({
             path: Routes.main.path,
             name: Routes.main.name,
             component: () => import('@/pages/main/MainPage.vue'),
+            meta: { layout: 'empty' },
         },
         {
             path: Routes.login.path,
@@ -31,6 +32,7 @@ const router = createRouter({
             path: Routes.ganttById.path,
             name: Routes.ganttById.name,
             component: () => import('@/pages/gantt/GanttTestPage.vue'),
+            meta: { layout: 'empty' },
         },
         {
             path: Routes.register.path,

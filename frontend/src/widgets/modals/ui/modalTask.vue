@@ -16,25 +16,27 @@ withDefaults(defineProps<IProps>(), {
 </script>
 
 <template>
-    <app-modal name="taskApp">
-        <div class="bg-gray p-[16px] rounded-[15px] relative">
-            <div class="flex w-full">
-                <div
-                    class="absolute flex items-center whitespace-nowrap justify-between px-[12px] py-[7px] border-[1px] rounded-[10px] text-accent-light border-accent-light text-[22px] gap-[5px] font-jost"
-                >
-                    <div class="size-[8px] rounded-[4px] bg-accent-light" />
-                    {{ sprintName }}
-                </div>
-                <h3 class="w-full text-accent-light text-[36px] text-center textTask">Задачи</h3>
-            </div>
-            <form-create-task
-                v-if="sprintId != null"
-                :sprint-id="sprintId"
-                :project-id="projectId"
-                :user-options="userOptions"
-            />
+  <app-modal name="taskApp">
+    <div class="bg-gray p-[16px] rounded-[15px] relative">
+      <div class="flex w-full">
+        <div
+          class="absolute flex items-center whitespace-nowrap justify-between px-[12px] py-[7px] border-[1px] rounded-[10px] text-accent-light border-accent-light text-[22px] gap-[5px] font-jost"
+        >
+          <div class="size-[8px] rounded-[4px] bg-accent-light" />
+          {{ sprintName }}
         </div>
-    </app-modal>
+        <h3 class="w-full text-accent-light text-[36px] text-center textTask">
+          Задачи
+        </h3>
+      </div>
+      <form-create-task
+        v-if="sprintId != null"
+        :sprint-id="sprintId"
+        :project-id="projectId"
+        :user-options="userOptions"
+      />
+    </div>
+  </app-modal>
 </template>
 
 <style scoped lang="scss">
