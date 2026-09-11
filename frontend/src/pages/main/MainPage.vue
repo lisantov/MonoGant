@@ -4,9 +4,10 @@ import { useRouter } from 'vue-router';
 import { push } from 'notivue';
 import { AppButton, AppIcon, SwitchProject, AppModal, AppMiniModal, useModal } from '@/shared';
 import { Routes } from '@/shared/lib';
-import { useProjects, useDeleteProject, useLogout, type Project } from '@/entities';
+import { useProjects, useDeleteProject, useLogout, type Project, useProfile } from '@/entities';
 import { FormCreateProject, FormEditProject } from '@/features';
 
+const { data: profile } = useProfile();
 const { data: projects, isLoading } = useProjects();
 const { mutateAsync: deleteProject } = useDeleteProject();
 const { mutateAsync: logout } = useLogout();

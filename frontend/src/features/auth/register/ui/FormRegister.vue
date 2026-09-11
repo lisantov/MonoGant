@@ -72,13 +72,13 @@ const onSubmit = handleSubmit((values) => {
     <app-button
       type="submit"
       :disabled="!!Object.keys(errors).length || isLoading"
+      variant-button="accent"
     >
       Регистрация
     </app-button>
-    <p class="text-[18px] font-montserrat text-white text-center">
-      Впервые на платформе?
-      <AppLink to="register">
-        Зарегистрироваться
+    <p class="text-[18px] font-montserrat text-white">
+      У вас есть аккаунт? <AppLink to="login">
+        Войти
       </AppLink>
     </p>
   </form>
