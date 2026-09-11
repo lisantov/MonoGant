@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AppIcon } from '@/shared';
+import { AppIcon, formatDate } from '@/shared';
 
 interface Props {
     name: string;
@@ -33,7 +33,7 @@ const translateStatus = (status: Props['status']): string => {
 
 <template>
   <div
-    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white cursor-pointer"
+    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white cursor-pointer transition-all duration-300 hover:scale-97"
     @click="emit('open')"
   >
     <div class="flex w-full justify-between items-center">
@@ -85,7 +85,7 @@ const translateStatus = (status: Props['status']): string => {
           </div>
         </div>
         <p class="text-xl">
-          {{ createDate }}
+          {{ formatDate(createDate) }}
         </p>
       </div>
       <div class="card">
@@ -147,7 +147,7 @@ const translateStatus = (status: Props['status']): string => {
           </div>
         </div>
         <p class="text-xl">
-          {{ endDate }}
+          {{ formatDate(endDate) }}
         </p>
       </div>
     </div>
