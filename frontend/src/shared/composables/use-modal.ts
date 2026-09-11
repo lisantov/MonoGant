@@ -8,7 +8,8 @@ type Modal =
     | 'projectDelete'
     | 'changePassword'
     | 'profileEdit'
-    | 'taskDetail';
+    | 'taskDetail'
+    | 'EditTeam';
 
 const currentModal = ref<Modal | null>(null);
 
