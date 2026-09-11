@@ -81,7 +81,7 @@ const onNotAvailable = (message: string) => push.info(message);
 </script>
 
 <template>
-  <div class="grid grid-cols-12 gap-6 w-full h-full">
+  <div class="grid grid-cols-12 gap-6 w-full max-h-screen overflow-hidden px-20 pt-10">
     <div class="col-span-8 flex flex-col gap-4">
       <div class="flex items-start">
         <div

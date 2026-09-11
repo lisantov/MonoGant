@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, provide, ref, toRef } from 'vue';
+import { computed, provide, ref, toRef, watch } from 'vue';
 import { GanttBody, GanttFooter, GanttHeader, GanttSidebar } from '.';
 import {
     addDays,
@@ -76,37 +76,36 @@ const { isPanning, onMouseDown: onPanStart } = usePanScroll(scrollContainer, {
         !!target.closest('button, a, input, select, textarea'),
 });
 
-onMounted(() => {
+const unwatch = watch(sprintsSource.allTasks, (newValue) => {
+    if (!newValue.length) return;
     const el = scrollContainer.value;
     if (!el) return;
 
-    nextTick();
-
-    const first = sprintsSource.allTasks.value.find((t) => !!t);
-    if (!first) {
-        el.scrollTo({ left: 0 });
-        return;
-    }
+    const first = newValue[0]!;
     const x = timescale.dateToX(new Date(first.task.started_at));
     el.scrollTo({ left: Math.max(0, x - 24) });
+    unwatch();
 });
 </script>
 
 <template>
-    <div class="flex flex-col w-full h-screen">
-        <div class="border flex overflow-hidden h-full">
-            <GanttSidebar :project-id="projectId" :members="members" />
+  <div class="flex flex-col w-full h-screen">
+    <div class="border flex overflow-hidden h-full">
+      <GanttSidebar
+        :project-id="projectId"
+        :members="members"
+      />
 
-            <section
-                ref="scrollContainer"
-                class="flex-1 flex flex-col overflow-auto [overflow-anchor:none]"
-                :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
-                @mousedown="onPanStart"
-            >
-                <GanttHeader :months="months" />
-                <GanttBody :months="months" />
-            </section>
-        </div>
-        <GanttFooter />
+      <section
+        ref="scrollContainer"
+        class="flex-1 flex flex-col overflow-auto [overflow-anchor:none]"
+        :class="{ 'cursor-grabbing': isPanning, 'cursor-grab': !isPanning }"
+        @mousedown="onPanStart"
+      >
+        <GanttHeader :months="months" />
+        <GanttBody :months="months" />
+      </section>
     </div>
+    <GanttFooter />
+  </div>
 </template>
