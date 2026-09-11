@@ -38,6 +38,13 @@ class Project extends Model
             ->using(ProjectUser::class);
     }
 
+    public function responsible(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'project_user')
+            ->wherePivot('role', RoleEnum::Responsible->value)
+            ->using(ProjectUser::class);
+    }
+
     public function sprints(): HasMany
     {
         return $this->hasMany(Sprint::class);
