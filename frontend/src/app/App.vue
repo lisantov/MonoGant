@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { DefaultLayout } from './layouts';
-
+import { RouterView, useRoute } from 'vue-router';
+import { DefaultLayout, EmptyLayout } from './layouts';
 import { Notivue, NotivueSwipe, Notification } from 'notivue';
+import { computed } from 'vue';
+
+const route = useRoute();
+const layout = computed(() => (route.meta.layout === 'empty' ? EmptyLayout : DefaultLayout));
 </script>
 
 <template>
@@ -12,14 +15,14 @@ import { Notivue, NotivueSwipe, Notification } from 'notivue';
     </NotivueSwipe>
   </Notivue>
 
-  <default-layout>
+  <layout>
     <transition
       name="fade"
       mode="out-in"
     >
       <router-view />
     </transition>
-  </default-layout>
+  </layout>
   <div id="modals" />
 </template>
 

@@ -2,8 +2,10 @@
 
 namespace App\Actions\Task;
 
+use App\Actions\Scheduling\RescheduleAction;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -13,29 +15,41 @@ class UpdateTaskAction
 
     public function handle(Task $task, array $data): Task
     {
-        if (array_key_exists('user_email', $data)) {
-            if ($data['user_email'] === null) {
-                $data['user_id'] = null;
-                unset($data['user_email']);
-            } else {
-                $user = User::where('email', $data['user_email'])->first();
+        return DB::transaction(function () use ($task, $data): Task {
+            $schedulingKeysPresent = array_key_exists('next_task_id', $data)
+                || array_key_exists('started_at', $data)
+                || array_key_exists('deadline_at', $data);
 
-                if ($user === null || ! $task->sprint->project->members()->where('users.id', $user->id)->exists()) {
-                    throw ValidationException::withMessages(['user_email' => 'The assigned user is not a member of the project.']);
+            if (array_key_exists('user_email', $data)) {
+                if ($data['user_email'] === null) {
+                    $data['user_id'] = null;
+                    unset($data['user_email']);
+                } else {
+                    $user = User::where('email', $data['user_email'])->first();
+
+                    if ($user === null || ! $task->sprint->project->members()->where('users.id', $user->id)->exists()) {
+                        throw ValidationException::withMessages(['user_email' => 'The assigned user is not a member of the project.']);
+                    }
+
+                    $data['user_id'] = $user->id;
+                    unset($data['user_email']);
                 }
-
-                $data['user_id'] = $user->id;
-                unset($data['user_email']);
             }
-        }
 
-        if (isset($data['next_task_id'])) {
-            $this->assertValidNextTask($task, $data['next_task_id']);
-        }
+            if (isset($data['next_task_id'])) {
+                $this->assertValidNextTask($task, $data['next_task_id']);
+            }
 
-        $task->update($data);
+            $task->update($data);
 
-        return $task->fresh();
+            if ($schedulingKeysPresent) {
+                RescheduleAction::run($task);
+            }
+
+            $task->sprint->project->extendDeadlineTo($task->sprint->deadline_at());
+
+            return $task->fresh();
+        });
     }
 
     private function assertValidNextTask(Task $task, int $nextTaskId): void

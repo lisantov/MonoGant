@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AppIcon } from '@/shared';
+import { AppIcon, formatDate } from '@/shared';
 
 interface Props {
     name: string;
@@ -13,6 +13,12 @@ interface Props {
 
 defineProps<Props>();
 
+const emit = defineEmits<{
+    edit: [];
+    delete: [];
+    open: [];
+}>();
+
 const translatedStatuses: Record<Props['status'], string> = {
     planned: 'Запланирован',
     in_progress: 'В работе',
@@ -23,13 +29,12 @@ const translatedStatuses: Record<Props['status'], string> = {
 const translateStatus = (status: Props['status']): string => {
     return translatedStatuses[status] ?? status;
 };
-
-const editProject = () => {};
 </script>
 
 <template>
   <div
-    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white"
+    class="flex bg-dark-gray p-8 gap-7 rounded-3xl flex-col w-full h-full font-montserrat text-white cursor-pointer transition-all duration-300 hover:scale-97"
+    @click="emit('open')"
   >
     <div class="flex w-full justify-between items-center">
       <p class="text-[28px]">
@@ -38,12 +43,13 @@ const editProject = () => {};
       <div class="flex gap-4">
         <div
           class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray border border-light-gray items-center"
-          @click="editProject"
+          @click.stop="emit('edit')"
         >
           <app-icon name="edit" />
         </div>
         <div
           class="min-w-10 min-h-10 cursor-pointer flex justify-center rounded-xl p-2 bg-gray border border-light-gray items-center"
+          @click.stop="emit('delete')"
         >
           <app-icon
             name="trashcan"
@@ -79,7 +85,7 @@ const editProject = () => {};
           </div>
         </div>
         <p class="text-xl">
-          {{ createDate }}
+          {{ formatDate(createDate) }}
         </p>
       </div>
       <div class="card">
@@ -141,7 +147,7 @@ const editProject = () => {};
           </div>
         </div>
         <p class="text-xl">
-          {{ endDate }}
+          {{ formatDate(endDate) }}
         </p>
       </div>
     </div>

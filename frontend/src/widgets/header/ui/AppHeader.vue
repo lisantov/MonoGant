@@ -32,7 +32,7 @@ const handleLogout = async () => {
             v-if="profile"
             class="text-sm text-gray-600"
           >
-            {{ profile.firstName }} {{ profile.lastName }}
+            {{ profile?.user.name }}
           </span>
           <app-button
             variant="ghost"

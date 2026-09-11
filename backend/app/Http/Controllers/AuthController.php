@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\ChangePasswordAction;
 use App\Actions\Auth\LoginAction;
 use App\Actions\Auth\LogoutAction;
 use App\Actions\Auth\RegisterAction;
+use App\Http\Requests\Auth\ChangePasswordUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
@@ -36,6 +38,15 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out successfully.',
+        ]);
+    }
+
+    public function changePassword(ChangePasswordUserRequest $request): JsonResponse
+    {
+        ChangePasswordAction::run($request->user(), $request->validated());
+
+        return response()->json([
+            'message' => 'Password changed successfully.',
         ]);
     }
 

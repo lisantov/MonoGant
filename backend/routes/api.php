@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', [UserController::class, 'profile'])->middleware('auth:sanctum');
+Route::patch('/user', [UserController::class, 'update'])->middleware('auth:sanctum');
 
 Route::get('/hi', [AuthController::class, 'index']);
 
@@ -16,6 +17,7 @@ Route::get('/hi', [AuthController::class, 'index']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/change-password', [AuthController::class, 'changePassword'])->middleware('auth:sanctum');
 
 // Projects
 Route::group(['prefix' => '/projects/', 'middleware' => 'auth:sanctum'], function () {

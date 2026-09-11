@@ -12,5 +12,3 @@ import { AppBackground } from '@/shared';
     </main>
   </div>
 </template>
-
-<style scoped></style>

@@ -3,24 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Task\CreateTaskAction;
+use App\Actions\Task\IndexTasksAction;
 use App\Actions\Task\UpdateTaskAction;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Sprint;
 use App\Models\Task;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class TaskController extends Controller
 {
-    public function index(Sprint $sprint)
+    public function index(Request $request, Sprint $sprint)
     {
         if (! Gate::inspect('project-show', $sprint->project)->allowed()) {
             throw new AccessDeniedHttpException;
         }
+        $tasks = IndexTasksAction::run($request->all(), $sprint);
 
-        return TaskResource::collection($sprint->tasks);
+        return TaskResource::collection($tasks);
     }
 
     public function store(StoreTaskRequest $request, Sprint $sprint)

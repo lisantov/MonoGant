@@ -8,6 +8,7 @@ use App\Models\Sprint;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -17,15 +18,21 @@ class CreateTaskAction
 
     public function handle(array $data, Sprint $sprint): Task
     {
-        if (isset($data['started_at'])) {
-            $data['status'] = Carbon::parse($data['started_at'])->lt(now())
-                ? StatusEnum::InProgress
-                : StatusEnum::Planned;
-        }
+        return DB::transaction(function () use ($data, $sprint): Task {
+            if (isset($data['started_at'])) {
+                $data['status'] = Carbon::parse($data['started_at'])->lt(now())
+                    ? StatusEnum::InProgress
+                    : StatusEnum::Planned;
+            }
 
-        $this->resolveAssignee($data, $sprint->project);
+            $this->resolveAssignee($data, $sprint->project);
 
-        return Task::create([...$data, 'sprint_id' => $sprint->id]);
+            $task = Task::create([...$data, 'sprint_id' => $sprint->id]);
+
+            $sprint->project->extendDeadlineTo($sprint->deadline_at());
+
+            return $task;
+        });
     }
 
     private function resolveAssignee(array &$data, Project $project): void

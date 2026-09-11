@@ -5,13 +5,14 @@ interface Props {
     variantButton?: 'accent' | 'danger' | 'solid';
     type?: 'button' | 'submit' | 'reset';
     disabled?: boolean;
+    size?: 'sm' | 'md' | 'lg';
 }
 
 withDefaults(defineProps<Props>(), {
     type: 'button',
     disabled: false,
-    variant: 'primary',
-    size: 'md',
+    variantButton: 'solid',
+    size: 'lg',
 });
 </script>
 
@@ -19,7 +20,7 @@ withDefaults(defineProps<Props>(), {
   <button
     :type="type"
     :disabled="disabled"
-    :class="buttonVariants({ type: variantButton })"
+    :class="buttonVariants({ type: variantButton, size })"
   >
     <slot />
   </button>

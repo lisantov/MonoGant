@@ -1,16 +1,22 @@
 import { api } from '@/shared/api';
-import type { Account, LoginBody, LoginResponse, RegisterBody } from '@/entities';
+import type {
+    AuthResponse,
+    ChangePasswordBody,
+    LoginBody,
+    ProfileResponse,
+    RegisterBody,
+} from '@/entities';
 
 export const accountService = {
-    login: (data: LoginBody) => api.post<LoginResponse>('auth/login', data).then((res) => res.data),
+    login: (data: LoginBody) => api.post<AuthResponse>('login', data).then((res) => res.data),
 
     register: (data: RegisterBody) =>
-        api.post<LoginResponse>('auth/register', data).then((res) => res.data),
+        api.post<AuthResponse>('register', data).then((res) => res.data),
 
-    profile: () => api.get<Account>('auth/profile').then((res) => res.data),
+    profile: () => api.get<ProfileResponse>('user').then((res) => res.data),
 
-    logout: () => api.post('auth/logout'),
+    logout: () => api.post('logout'),
 
-    updateProfile: (data: Partial<Account>) =>
-        api.patch<Account>('auth/profile', data).then((res) => res.data),
+    changePassword: (data: ChangePasswordBody) =>
+        api.post('change-password', data).then((res) => res.data),
 };

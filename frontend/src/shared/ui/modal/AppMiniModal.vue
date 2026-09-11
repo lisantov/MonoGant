@@ -21,6 +21,7 @@
           padding="none"
           class="px-11 py-4 w-30 h-[49px]"
           size="sm"
+          @click="onConfirm"
         >
           Да
         </app-button>
@@ -41,5 +42,14 @@ withDefaults(defineProps<Props>(), {
     title: '',
 });
 
+const emit = defineEmits<{
+    confirm: [];
+}>();
+
 const { closeModal } = useModal();
+
+const onConfirm = () => {
+    emit('confirm');
+    closeModal();
+};
 </script>
