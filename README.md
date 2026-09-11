@@ -4,7 +4,7 @@
 
 Запуск проекта:
 
-Заполните `.env` в `backend`.
+Заполните `.env` в `backend` (для работы с докером уже все готово).
 
 ```shell
 cp backend/.env.example backend/.env
