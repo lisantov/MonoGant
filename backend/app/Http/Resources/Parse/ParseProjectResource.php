@@ -26,6 +26,9 @@ class ParseProjectResource extends JsonResource
             'owner' => $owner ? new UserResource($owner) : null,
             'members' => UserResource::collection($this->members),
             'sprints' => ParseSprintResource::collection($this->sprints),
+            'completed_tasks_count' => $this->completedTasksCount(),
+            'total_tasks_count' => $this->totalTasksCount(),
+            'completion_percentage' => $this->completionPercentage(),
         ];
     }
 }
