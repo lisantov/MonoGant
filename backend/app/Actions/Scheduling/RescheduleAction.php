@@ -12,12 +12,13 @@ use Lorisleiva\Actions\Concerns\AsAction;
 /**
  * Перебалансирует расклад после привязки задачи или изменения ее дат.
  *
- * Связанные задачи (те, у которых есть next_task_id или предшественник) образуют сплошную
- * цепочку Ганта без зазоров: каждый преемник начинается ровно с дедлайна предшественника
- * (перекрытие сдвигается вперёд, ручной гэп стягивается назад), длительность задачи сохраняется.
- * Спринт рассматривается как блок: его рамка охватывает ВСЕ задачи спринта. Когда конец блока
- * переходит в следующий спринт, весь следующий блок сдвигается на минимальную величину (zero-gap),
- * чтобы ни одна задача не вылезала за рамки своего спринта.
+ * Связанные задачи (те, у которых есть next_task_id или предшественник) образуют цепочку Ганта
+ * с фиксированным шагом в один день: каждый преемник начинается на следующий день после дедлайна
+ * предшественника (перекрытие сдвигается вперёд, ручной гэп стягивается назад), длительность
+ * задачи сохраняется. Спринт рассматривается как блок: его рамка охватывает ВСЕ задачи спринта.
+ * Когда конец блока переходит в следующий спринт, весь следующий блок сдвигается,
+ * чтобы его первая задача начиналась на следующий день после конца предыдущего блока
+ * и ни одна задача не вылезала за рамки своего спринта.
  */
 class RescheduleAction
 {
@@ -47,12 +48,13 @@ class RescheduleAction
 
         $deadline = $predecessor->deadline_at;
         $start = $anchor->started_at;
+        $target = $deadline?->copy()->addDay();
 
-        if ($deadline === null || ($start !== null && $start->equalTo($deadline))) {
+        if ($target === null || ($start !== null && $start->equalTo($target))) {
             return false;
         }
 
-        $this->shiftTask($anchor, $deadline);
+        $this->shiftTask($anchor, $target);
 
         return true;
     }
@@ -71,12 +73,13 @@ class RescheduleAction
 
             $deadline = $previous->deadline_at;
             $start = $current->started_at;
+            $target = $deadline?->copy()->addDay();
 
-            if ($deadline === null || ($start !== null && $start->equalTo($deadline))) {
+            if ($target === null || ($start !== null && $start->equalTo($target))) {
                 break;
             }
 
-            $this->shiftTask($current, $deadline);
+            $this->shiftTask($current, $target);
             $previous = $current;
             $moved = true;
         }
@@ -114,8 +117,10 @@ class RescheduleAction
             $earliestStart = $this->earliestStart($tasks);
 
             if ($earliestStart !== null) {
-                if ($previousEnd !== null && $earliestStart->lt($previousEnd)) {
-                    $shiftDays = max(1, (int) ceil(abs($previousEnd->diffInDays($earliestStart))));
+                $target = $previousEnd?->copy()->addDay();
+
+                if ($target !== null && $earliestStart->lt($target)) {
+                    $shiftDays = max(1, (int) ceil(abs($target->diffInDays($earliestStart))));
 
                     foreach ($tasks as $task) {
                         $baseStart = $task->started_at ?? $earliestStart;
