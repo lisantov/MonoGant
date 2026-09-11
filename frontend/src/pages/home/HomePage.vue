@@ -2,12 +2,6 @@
   <section class="relative w-full overflow-x-hidden text-white">
     <div class="flex mx-auto contentBlock max-w-6xl items-center gap-20">
       <div class="space-y-12">
-        <app-button
-          variant-button="solid"
-          @click="openModal('mini')"
-        >
-          Модалка
-        </app-button>
         <h1
           class="text-5xl leading-tight font-extrabold tracking-tight md:text-6xl lg:text-7xl xl:text-8xl"
         >
@@ -21,7 +15,10 @@
         </p>
 
         <div class="flex items-center gap-6">
-          <app-button @click="router.push('/auth/login')">
+          <app-button
+            variant-button="accent"
+            @click="router.push('/auth/login')"
+          >
             Войти в аккаунт
           </app-button>
           <app-button
@@ -108,8 +105,7 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { AppButton, AppMiniModal, useModal } from '@/shared';
-const { openModal } = useModal();
+import { AppButton, AppMiniModal } from '@/shared';
 
 const router = useRouter();
 </script>
