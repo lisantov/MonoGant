@@ -8,6 +8,7 @@ interface Props {
     type?: string;
     placeholder?: string;
     required?: boolean;
+    size?: 'sm' | 'lg';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -16,10 +17,11 @@ const props = withDefaults(defineProps<Props>(), {
     error: undefined,
     placeholder: '',
     required: false,
+    size: 'lg',
 });
 
 const check = ref<boolean>(false);
-const model = defineModel<string>();
+const model = defineModel<string>({ default: '' });
 
 const checkPassword = () => {
     check.value = !check.value;
@@ -44,7 +46,7 @@ const checkType = computed<string>(() => {
     </transition>
     <label
       class="label justify-center items-center"
-      :class="inputVariants({ error: !!error, disabled })"
+      :class="inputVariants({ error: !!error, disabled, size })"
     >
       <input
         v-model="model"

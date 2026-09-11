@@ -322,7 +322,7 @@ const linkPreviewPath = computed(() => {
         >
           <div
             v-if="isItToday(month, day)"
-            class="absolute top-0.5 bottom-0.5 w-2 rounded-xl -left-1 bg-red-600 z-999 opacity-30"
+            class="absolute top-2.5 bottom-2.5 w-30 rounded-3xl left-0 bg-red-600 z-999 opacity-20"
           />
         </div>
       </div>
@@ -378,7 +378,7 @@ const linkPreviewPath = computed(() => {
           >
             <path
               d="M 0 0 L 10 5 L 0 10 z"
-              fill="#93c5fd"
+              fill="#56ae63"
             />
           </marker>
           <marker
@@ -392,7 +392,7 @@ const linkPreviewPath = computed(() => {
           >
             <path
               d="M 0 0 L 10 5 L 0 10 z"
-              fill="#1e40af"
+              fill="#55f05b"
             />
           </marker>
         </defs>
@@ -422,7 +422,7 @@ const linkPreviewPath = computed(() => {
 
 <style scoped>
 .gantt-link {
-    stroke: #93c5fd;
+    stroke: #56ae63;
     stroke-width: 1.5;
     pointer-events: stroke;
     transition:
@@ -431,7 +431,7 @@ const linkPreviewPath = computed(() => {
 }
 
 .gantt-link--active {
-    stroke: #1e40af;
+    stroke: #55f05b;
     stroke-width: 2;
 }
 
