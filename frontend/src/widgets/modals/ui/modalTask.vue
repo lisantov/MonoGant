@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { AppButton, AppModal } from '@/shared';
+import { FormCreateTask } from '@/features';
+import { AppModal } from '@/shared';
 import AppTask from '@/shared/ui/task/AppTask.vue';
+
+interface IProps {
+    sprintId: number;
+}
+defineProps<IProps>();
 </script>
 
 <template>
@@ -17,30 +23,10 @@ import AppTask from '@/shared/ui/task/AppTask.vue';
           Задачи
         </h3>
       </div>
-      <div>
-        <div>
-          <select>
-            выбрать исполнителя
-          </select>
-          <div />
-        </div>
-        <div class="flex justify-between">
-          <label>
-            <input
-              type="date"
-              class="date"
-            >
-          </label>
-          <div class="h-[2px] w-[54px] bg-input-placeholder" />
-          <label>
-            <input
-              type="date"
-              class="date"
-            >
-          </label>
-        </div>
-        <app-button>Создать задание</app-button>
-      </div>
+      <form-create-task
+        :sprint-id="sprintId"
+        s
+      />
       <div class="flex flex-col p-[20px] w-[850px] gap-[16px]">
         <app-task />
         <app-task />

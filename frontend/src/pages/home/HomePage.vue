@@ -102,7 +102,14 @@
           </ul>
         </div>
       </div>
-      <modal-task />
+      <modal-task
+        :sprint-id="1"
+        :user-options="[
+          {
+            id: 1,
+          },
+        ]"
+      />
       <AppMiniModal />
     </div>
   </section>

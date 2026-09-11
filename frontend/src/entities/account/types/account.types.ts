@@ -3,7 +3,6 @@ export interface Account {
     email: string;
     firstName: string;
     lastName: string;
-    avatar?: string;
     createdAt: string;
     updatedAt: string;
 }
