@@ -99,12 +99,12 @@ onUnmounted(() => {
         class="widget-title flex flex-col items-center gap-1 text-center"
       >
         <p class="widget-text text-[32px] font-jost text-white transition duration-300">
-          {{ listText[positionPoint][0] }}
+          {{ listText[positionPoint]![0] }}
         </p>
         <p
           class="widget-text text-[18px] font-montserrat text-white/70 transition duration-300"
         >
-          {{ listText[positionPoint][1] }}
+          {{ listText[positionPoint]![1] }}
         </p>
       </div>
 
@@ -136,8 +136,9 @@ onUnmounted(() => {
     background-image: linear-gradient(0deg, var(--dark-gray) 21%, transparent 81%);
 }
 
-.widget-title {
+div.widget-title {
     transition: 0.5s all;
+    opacity: 1;
     animation: text-swap 0.5s forwards;
     animation-delay: 2.5s;
 }
