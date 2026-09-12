@@ -139,7 +139,7 @@ const sortedComments = computed<Comment[]>(() => comments.value?.data ?? []);
       <form-edit-task
         v-if="editing"
         :key="task.id"
-        :task="task"
+        :task="task.data"
         :user-options="members ?? []"
         :project-id="projectId"
         @updated="

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 import { GANTT_TASK_STATUS, SPRINTS_KEY } from '../lib';
-import { AppButton, AppIcon, Routes, useModal } from '@/shared';
+import { AppButton, AppIcon, AppModal, Routes, useModal } from '@/shared';
 import { useRouter } from 'vue-router';
 import { EditTeamModal } from '@/widgets/modals/edit-team';
 
@@ -47,6 +47,10 @@ const { openModal } = useModal();
         Настроить команду
       </app-button>
     </div>
+
+    <AppModal name="sosat">
+      MUHAHA
+    </AppModal>
     <EditTeamModal :members="props.members" />
   </div>
 </template>

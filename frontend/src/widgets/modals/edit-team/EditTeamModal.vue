@@ -5,7 +5,7 @@
         class="font-montserrat text-2xl text-accent-light drop-shadow-[0_0_6px_rgba(0,185,6,0.75)]"
       >
         Редактирование команды проекта
-        <span>(Участников: {{ props.members!.length }})</span>
+        <span>(Участников: {{ props.members?.length ?? 0 }})</span>
       </p>
       <div
         class="flex w-full projects-scroll flex-col gap-4 overflow-y-auto max-h-150 text-white"

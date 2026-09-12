@@ -117,7 +117,7 @@ const unwatch = watch(sprintsSource.allTasks, (newValue) => {
         <GanttBody :months="months" />
       </section>
     </div>
-    <GanttFooter />
+    <GanttFooter :members="members" />
     <ModalTaskDetail
       v-if="selection?.taskId"
       :project-id="projectId"
